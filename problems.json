@@ -8,10 +8,16 @@
     "title": "Hello World",
     "description": "Write a program that prints **Hello, World!** to the screen.\n\nThis is the classic first program in any language!",
     "concepts": ["print"],
+    "conceptLesson": {
+      "title": "The print() Function",
+      "content": "The `print()` function displays text on the screen. Put your message inside quotes (single or double) and pass it to `print()`.",
+      "code": "print(\"Hello, World!\")\nprint('You can also use single quotes')"
+    },
     "hints": [
       "Use the print() function",
       "Put your text inside quotes: print(\"Hello, World!\")"
     ],
+    "solution": "print(\"Hello, World!\")",
     "examples": [
       { "input": "", "output": "Hello, World!" }
     ],
@@ -28,12 +34,18 @@
     "difficulty": "easy",
     "title": "Greet the User",
     "description": "Write a program that reads a **name** from input and prints a greeting in the format:\n**Hello, {name}!**",
-    "concepts": ["input", "print", "string concatenation"],
+    "concepts": ["input", "print", "f-string"],
+    "conceptLesson": {
+      "title": "Reading Input & F-Strings",
+      "content": "Use `input()` to read text from the user. F-strings let you embed variables directly inside a string using curly braces `{}`.",
+      "code": "name = input()          # reads a line of text\nprint(f\"Hello, {name}!\")  # f-string formatting"
+    },
     "hints": [
       "Use input() to read the name",
       "Use an f-string: f\"Hello, {name}!\"",
       "Or use concatenation: \"Hello, \" + name + \"!\""
     ],
+    "solution": "name = input()\nprint(f\"Hello, {name}!\")",
     "examples": [
       { "input": "Alice", "output": "Hello, Alice!" }
     ],
@@ -53,11 +65,17 @@
     "title": "Simple Calculator",
     "description": "Read two integers from input (one per line) and print their **sum**, **difference**, and **product**, each on a new line.",
     "concepts": ["input", "int", "arithmetic"],
+    "conceptLesson": {
+      "title": "Converting Types & Arithmetic",
+      "content": "`input()` always returns a string. Use `int()` to convert it to a number. Python supports standard math operators: `+`, `-`, `*`, `/`.",
+      "code": "a = int(input())  # read and convert to integer\nb = int(input())\nprint(a + b)      # addition\nprint(a * b)      # multiplication"
+    },
     "hints": [
       "Use int(input()) to read numbers",
       "Store them in variables a and b",
       "Print a+b, a-b, and a*b on separate lines"
     ],
+    "solution": "a = int(input())\nb = int(input())\nprint(a + b)\nprint(a - b)\nprint(a * b)",
     "examples": [
       { "input": "10\n3", "output": "13\n7\n30" }
     ],
@@ -77,10 +95,16 @@
     "title": "Even or Odd",
     "description": "Read an integer from input and print **\"Even\"** if it's even, or **\"Odd\"** if it's odd.",
     "concepts": ["if/else", "modulo"],
+    "conceptLesson": {
+      "title": "If/Else & The Modulo Operator",
+      "content": "The `if/else` statement lets your program make decisions. The **modulo operator** `%` gives the remainder of division — if `n % 2 == 0`, the number is even.",
+      "code": "n = int(input())\nif n % 2 == 0:\n    print(\"Even\")\nelse:\n    print(\"Odd\")"
+    },
     "hints": [
       "Use the modulo operator: number % 2",
       "If the remainder is 0, the number is even"
     ],
+    "solution": "n = int(input())\nif n % 2 == 0:\n    print(\"Even\")\nelse:\n    print(\"Odd\")",
     "examples": [
       { "input": "4", "output": "Even" },
       { "input": "7", "output": "Odd" }
@@ -102,10 +126,16 @@
     "title": "Grade Calculator",
     "description": "Read a score (0–100) from input and print the grade:\n- **90–100**: A\n- **80–89**: B\n- **70–79**: C\n- **60–69**: D\n- **Below 60**: F",
     "concepts": ["if/elif/else", "comparison"],
+    "conceptLesson": {
+      "title": "If / Elif / Else Chains",
+      "content": "When you have multiple conditions, use `elif` (short for \"else if\"). Python checks conditions top-to-bottom and executes the **first** one that's true.",
+      "code": "score = int(input())\nif score >= 90:\n    print(\"A\")\nelif score >= 80:\n    print(\"B\")\nelse:\n    print(\"Other\")"
+    },
     "hints": [
       "Use if/elif/else chain",
       "Check from highest to lowest: if score >= 90, elif score >= 80, etc."
     ],
+    "solution": "score = int(input())\nif score >= 90:\n    print(\"A\")\nelif score >= 80:\n    print(\"B\")\nelif score >= 70:\n    print(\"C\")\nelif score >= 60:\n    print(\"D\")\nelse:\n    print(\"F\")",
     "examples": [
       { "input": "85", "output": "B" },
       { "input": "42", "output": "F" }
@@ -128,11 +158,17 @@
     "title": "FizzBuzz",
     "description": "Read a number **N** and print the numbers from 1 to N, but:\n- For multiples of 3, print **\"Fizz\"**\n- For multiples of 5, print **\"Buzz\"**\n- For multiples of both 3 and 5, print **\"FizzBuzz\"**",
     "concepts": ["for loop", "modulo", "if/elif"],
+    "conceptLesson": {
+      "title": "Combining Loops & Conditions",
+      "content": "FizzBuzz is a classic programming challenge. The key insight: check divisibility by **15 first** (both 3 and 5), then by 3, then by 5, then print the number.",
+      "code": "for i in range(1, 6):\n    if i % 15 == 0:\n        print(\"FizzBuzz\")\n    elif i % 3 == 0:\n        print(\"Fizz\")\n    elif i % 5 == 0:\n        print(\"Buzz\")\n    else:\n        print(i)"
+    },
     "hints": [
       "Use a for loop with range(1, n+1)",
       "Check divisibility by 15 first (both 3 and 5)",
       "Then check 3, then 5, then just print the number"
     ],
+    "solution": "n = int(input())\nfor i in range(1, n + 1):\n    if i % 15 == 0:\n        print(\"FizzBuzz\")\n    elif i % 3 == 0:\n        print(\"Fizz\")\n    elif i % 5 == 0:\n        print(\"Buzz\")\n    else:\n        print(i)",
     "examples": [
       { "input": "15", "output": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz" }
     ],
@@ -151,11 +187,17 @@
     "title": "Sum of Even Numbers",
     "description": "Read a number **N**, then read **N** integers, and print the **sum of all even numbers** among them.\n\n**Hint:** Use the modulo operator `%` to check if a number is even.",
     "concepts": ["for loop", "modulo", "accumulator"],
+    "conceptLesson": {
+      "title": "The Accumulator Pattern",
+      "content": "A common pattern: start with a variable at 0 (the **accumulator**), loop through items, and add to it when a condition is met. After the loop, the variable holds your answer.",
+      "code": "total = 0            # accumulator\nfor i in range(3):\n    num = int(input())\n    if num % 2 == 0:   # condition\n        total += num   # accumulate\nprint(total)"
+    },
     "hints": [
       "Initialize a sum variable to 0",
       "Loop N times, reading a number each time",
       "If number % 2 == 0, add it to the sum"
     ],
+    "solution": "n = int(input())\ntotal = 0\nfor i in range(n):\n    num = int(input())\n    if num % 2 == 0:\n        total += num\nprint(total)",
     "examples": [
       { "input": "5\n1\n2\n3\n4\n5", "output": "6" }
     ],
@@ -175,12 +217,18 @@
     "title": "Collect Names",
     "description": "Write a program that keeps asking the user to enter names. When the user types **\"show\"**, the program should stop asking and print all the names entered so far, each on a new line.\n\n**Hint:** Use a `while` loop and `input()` function.",
     "concepts": ["while loop", "lists", "break"],
+    "conceptLesson": {
+      "title": "While Loops & Break",
+      "content": "A `while True` loop runs forever — until you use `break` to exit. This is perfect when you don't know in advance how many times to loop (e.g., waiting for user to type \"show\").",
+      "code": "while True:\n    text = input()\n    if text == \"stop\":\n        break        # exit the loop\n    print(f\"You typed: {text}\")"
+    },
     "hints": [
       "Use a while True loop",
       "Read input each iteration",
       "If input is 'show', break out of the loop",
       "Otherwise, append to a list, then print with '\\n'.join()"
     ],
+    "solution": "names = []\nwhile True:\n    name = input()\n    if name == \"show\":\n        break\n    names.append(name)\nprint(\"\\n\".join(names))",
     "examples": [
       { "input": "Alice\nBob\nCharlie\nshow", "output": "Alice\nBob\nCharlie" }
     ],
@@ -200,10 +248,16 @@
     "title": "Multiplication Table",
     "description": "Read a number **N** and print its multiplication table from 1 to 10.\n\nFormat each line as: **N x i = result**",
     "concepts": ["for loop", "range", "f-string"],
+    "conceptLesson": {
+      "title": "For Loops & Range",
+      "content": "The `for` loop with `range()` lets you repeat code a specific number of times. `range(1, 11)` gives you numbers 1 through 10.",
+      "code": "for i in range(1, 4):   # 1, 2, 3\n    print(f\"Number: {i}\")\n\n# range(start, stop) — stop is excluded!"
+    },
     "hints": [
       "Use a for loop with range(1, 11)",
       "Use an f-string: f\"{n} x {i} = {n*i}\""
     ],
+    "solution": "n = int(input())\nfor i in range(1, 11):\n    print(f\"{n} x {i} = {n * i}\")",
     "examples": [
       { "input": "5", "output": "5 x 1 = 5\n5 x 2 = 10\n5 x 3 = 15\n5 x 4 = 20\n5 x 5 = 25\n5 x 6 = 30\n5 x 7 = 35\n5 x 8 = 40\n5 x 9 = 45\n5 x 10 = 50" }
     ],
@@ -222,10 +276,16 @@
     "title": "Reverse a String",
     "description": "Read a string from input and print the **reversed version** of that string.\n\n**Hint:** Python strings support slicing with a step value.",
     "concepts": ["string slicing", "indexing"],
+    "conceptLesson": {
+      "title": "String Slicing",
+      "content": "Python strings can be sliced with `[start:stop:step]`. A step of `-1` reverses the string. This is one of Python's most powerful features!",
+      "code": "s = \"Python\"\nprint(s[0:3])    # 'Pyt' — first 3 chars\nprint(s[::-1])   # 'nohtyP' — reversed\nprint(s[1::2])   # 'yhn' — every 2nd char"
+    },
     "hints": [
       "You can reverse a string with slicing: s[::-1]",
       "Or use a loop to build the reversed string"
     ],
+    "solution": "s = input()\nprint(s[::-1])",
     "examples": [
       { "input": "hello", "output": "olleh" }
     ],
@@ -245,11 +305,17 @@
     "title": "Count Vowels",
     "description": "Read a string and print how many **vowels** (a, e, i, o, u) it contains.\n\nCount both uppercase and lowercase vowels.",
     "concepts": ["string iteration", "lower()", "in operator"],
+    "conceptLesson": {
+      "title": "Iterating Over Strings",
+      "content": "You can loop through each character in a string with a `for` loop. The `in` operator checks if a character exists in another string. Use `.lower()` to handle case-insensitivity.",
+      "code": "text = \"Hello\"\nfor char in text:\n    if char.lower() in \"aeiou\":\n        print(f\"{char} is a vowel!\")"
+    },
     "hints": [
       "Convert the string to lowercase first",
       "Loop through each character",
       "Check if it's in 'aeiou'"
     ],
+    "solution": "s = input()\ncount = 0\nfor char in s:\n    if char.lower() in 'aeiou':\n        count += 1\nprint(count)",
     "examples": [
       { "input": "Hello World", "output": "3" }
     ],
@@ -270,11 +336,17 @@
     "title": "Palindrome Check",
     "description": "Read a string and print **\"Yes\"** if it reads the same forwards and backwards (case-insensitive), otherwise print **\"No\"**.",
     "concepts": ["string slicing", "lower()", "comparison"],
+    "conceptLesson": {
+      "title": "Palindromes & String Comparison",
+      "content": "A palindrome reads the same forwards and backwards (like \"racecar\"). To check: convert to lowercase, reverse, and compare. Python makes this a one-liner!",
+      "code": "s = \"Racecar\"\nlowered = s.lower()           # \"racecar\"\nreversed_s = lowered[::-1]    # \"racecar\"\nprint(lowered == reversed_s)  # True"
+    },
     "hints": [
       "Convert to lowercase first",
       "Compare the string with its reverse",
       "s.lower() == s.lower()[::-1]"
     ],
+    "solution": "s = input()\nif s.lower() == s.lower()[::-1]:\n    print(\"Yes\")\nelse:\n    print(\"No\")",
     "examples": [
       { "input": "Racecar", "output": "Yes" },
       { "input": "Hello", "output": "No" }
@@ -296,11 +368,17 @@
     "title": "Find the Maximum",
     "description": "Read **N**, then read **N** integers. Print the **largest number** among them.\n\nDo **not** use the built-in `max()` function.",
     "concepts": ["lists", "comparison", "loop"],
+    "conceptLesson": {
+      "title": "Lists & Finding Extremes",
+      "content": "A list stores multiple values. To find the maximum without `max()`, set the first element as your current max, then loop through the rest — update your max whenever you find something larger.",
+      "code": "nums = [3, 7, 2, 9, 1]\ncurrent_max = nums[0]\nfor num in nums[1:]:\n    if num > current_max:\n        current_max = num\nprint(current_max)  # 9"
+    },
     "hints": [
       "Read all numbers into a list",
       "Set the first number as the current max",
       "Loop through the rest, update max if you find a larger one"
     ],
+    "solution": "n = int(input())\nnums = []\nfor _ in range(n):\n    nums.append(int(input()))\ncurrent_max = nums[0]\nfor num in nums[1:]:\n    if num > current_max:\n        current_max = num\nprint(current_max)",
     "examples": [
       { "input": "5\n3\n7\n2\n9\n1", "output": "9" }
     ],
@@ -320,11 +398,17 @@
     "title": "Remove Duplicates",
     "description": "Read **N**, then read **N** integers. Print the unique numbers in the **order they first appeared**, each on a new line.",
     "concepts": ["lists", "set logic", "order preservation"],
+    "conceptLesson": {
+      "title": "Preserving Order While Removing Duplicates",
+      "content": "A `set` removes duplicates but loses order. To keep the original order: use a list to track \"seen\" items, and only add new ones. This is a common interview pattern!",
+      "code": "nums = [3, 1, 3, 5, 1]\nseen = []\nfor num in nums:\n    if num not in seen:\n        seen.append(num)\nprint(seen)  # [3, 1, 5]"
+    },
     "hints": [
       "Use a list to track seen numbers",
       "Only add a number if it's not already in the seen list",
       "Print each unique number"
     ],
+    "solution": "n = int(input())\nseen = []\nfor _ in range(n):\n    num = int(input())\n    if num not in seen:\n        seen.append(num)\nfor num in seen:\n    print(num)",
     "examples": [
       { "input": "7\n3\n1\n3\n5\n1\n7\n3", "output": "3\n1\n5\n7" }
     ],
@@ -344,11 +428,17 @@
     "title": "Factorial",
     "description": "Read a non-negative integer **N** and print its **factorial** (N!).\n\nRecall: 0! = 1, and N! = 1 × 2 × 3 × ... × N",
     "concepts": ["functions", "loops", "recursion"],
+    "conceptLesson": {
+      "title": "Defining Functions",
+      "content": "Functions let you organize reusable blocks of code. Use `def` to define a function. A function can take parameters and `return` a result.",
+      "code": "def greet(name):\n    return f\"Hello, {name}!\"\n\ndef add(a, b):\n    return a + b\n\nprint(greet(\"Alice\"))  # Hello, Alice!\nprint(add(3, 5))       # 8"
+    },
     "hints": [
       "Define a function factorial(n)",
       "Use a loop or recursion",
       "Don't forget: 0! = 1"
     ],
+    "solution": "def factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nn = int(input())\nprint(factorial(n))",
     "examples": [
       { "input": "5", "output": "120" },
       { "input": "0", "output": "1" }
@@ -370,11 +460,17 @@
     "title": "Is Prime?",
     "description": "Read an integer **N** (N ≥ 2) and print **\"Yes\"** if it's a prime number, otherwise **\"No\"**.\n\nA prime number is only divisible by 1 and itself.",
     "concepts": ["functions", "loops", "optimization"],
+    "conceptLesson": {
+      "title": "Checking Primes Efficiently",
+      "content": "To check if N is prime, you only need to test divisors up to √N. If no number from 2 to √N divides N evenly, it's prime. This is much faster than checking all numbers up to N!",
+      "code": "import math\n\ndef is_prime(n):\n    if n < 2:\n        return False\n    for i in range(2, math.isqrt(n) + 1):\n        if n % i == 0:\n            return False\n    return True"
+    },
     "hints": [
       "Check divisibility from 2 to sqrt(N)",
       "If any number divides N evenly, it's not prime",
       "Import math and use math.isqrt(n) for the square root"
     ],
+    "solution": "import math\n\ndef is_prime(n):\n    if n < 2:\n        return False\n    for i in range(2, math.isqrt(n) + 1):\n        if n % i == 0:\n            return False\n    return True\n\nn = int(input())\nprint(\"Yes\" if is_prime(n) else \"No\")",
     "examples": [
       { "input": "7", "output": "Yes" },
       { "input": "12", "output": "No" }
@@ -396,11 +492,17 @@
     "title": "Fibonacci Sequence",
     "description": "Read an integer **N** and print the first **N** numbers of the Fibonacci sequence, each on a new line.\n\nThe Fibonacci sequence starts: 0, 1, 1, 2, 3, 5, 8, 13, ...",
     "concepts": ["functions", "loops", "sequences"],
+    "conceptLesson": {
+      "title": "The Fibonacci Pattern",
+      "content": "Fibonacci is a sequence where each number is the sum of the two before it. The trick: use two variables `a` and `b`, and in each step do `a, b = b, a + b`. This is Python's tuple swap!",
+      "code": "a, b = 0, 1\nfor _ in range(5):\n    print(a)\n    a, b = b, a + b\n# Output: 0, 1, 1, 2, 3"
+    },
     "hints": [
       "Start with a=0 and b=1",
       "In each step: print a, then set a, b = b, a+b",
       "Repeat N times"
     ],
+    "solution": "n = int(input())\na, b = 0, 1\nfor _ in range(n):\n    print(a)\n    a, b = b, a + b",
     "examples": [
       { "input": "7", "output": "0\n1\n1\n2\n3\n5\n8" }
     ],

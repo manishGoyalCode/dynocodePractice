@@ -93,6 +93,8 @@ def get_problems():
             "difficulty": p.get("difficulty", "easy"),
             "concepts": p.get("concepts", []),
             "hints": p.get("hints", []),
+            "conceptLesson": p.get("conceptLesson"),
+            "solution": p.get("solution"),
         }
         for p in problems
     ]
@@ -116,6 +118,8 @@ def get_problem(problem_id: int):
                 "difficulty": p.get("difficulty", "easy"),
                 "concepts": p.get("concepts", []),
                 "hints": p.get("hints", []),
+                "conceptLesson": p.get("conceptLesson"),
+                "solution": p.get("solution"),
             }
     return {"error": "Problem not found"}, 404
 
