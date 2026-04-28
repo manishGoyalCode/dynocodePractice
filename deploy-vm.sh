@@ -13,9 +13,14 @@ lsof -ti:3000 | xargs kill -9 2>/dev/null || true
 # --- 1. Backend Setup ---
 echo "🐍 Setting up Python Backend..."
 cd backend
-python3 -m venv venv
-source venv/bin/venv/activate || source venv/bin/activate
-pip install -r requirements.txt
+if [ ! -d "venv" ]; then
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r requirements.txt
+else
+    source venv/bin/activate
+    echo "⏩ Backend venv found, skipping pip install."
+fi
 
 # Start Backend in background
 echo "⚙️ Starting Backend API on port 8000..."
@@ -24,9 +29,13 @@ BACKEND_PID=$!
 cd ..
 
 # --- 2. Frontend Setup ---
-echo "📦 Setting up Node Frontend..."
 cd frontend
-npm install
+if [ ! -d "node_modules" ]; then
+    echo "📦 Installing Node dependencies (this may take a minute)..."
+    npm install --prefer-offline --no-audit
+else
+    echo "⏩ node_modules found, skipping npm install."
+fi
 
 # Start Frontend in background (using dev mode for instant start)
 echo "🌐 Starting Frontend on port 3000..."
