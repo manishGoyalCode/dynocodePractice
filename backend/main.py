@@ -19,7 +19,12 @@ def health_check():
 # CORS for Frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allows all origins for VM/Remote deployment
+    allow_origins=[
+        "http://localhost:3000",
+        "https://dynocode.in",
+        "https://www.dynocode.in",
+        "https://orca-app-daxtp.ondigitalocean.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
