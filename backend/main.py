@@ -42,9 +42,37 @@ class SubmitRequest(BaseModel):
 
 def execute_code(code: str, stdin_input: str = "", timeout: int = 2) -> dict:
     """Run Python code in a subprocess with optional stdin and a timeout."""
+    
+    # 🛡️ SECURITY GUARD: Block dangerous operations
+    # We disable common modules and use an audit hook to block system calls
+    guard_script = """
+import sys
+
+# Disable dangerous modules
+for mod in ['os', 'subprocess', 'shutil', 'socket', 'urllib', 'requests']:
+    sys.modules[mod] = None
+
+# Audit hook to block dangerous actions (Python 3.8+)
+def audit_hook(event, args):
+    blocked_events = {
+        'os.system', 'os.spawn', 'subprocess.Popen', 'socket.connect',
+        'open', 'compile', 'pathlib.Path.unlink', 'pathlib.Path.mkdir'
+    }
+    if event in blocked_events:
+        # We allow reading sys.stdin but block generic 'open'
+        if event == 'open' and args[0] in [0, 1, 2]: # Allow stdin/out/err
+            return
+        raise RuntimeError(f"❌ Security Error: '{event}' is not allowed in this environment.")
+
+sys.addaudithook(audit_hook)
+
+# --- USER CODE BEGINS ---
+"""
+    full_code = guard_script + code
+    
     try:
         result = subprocess.run(
-            [sys.executable, "-c", code],
+            [sys.executable, "-c", full_code],
             input=stdin_input,
             capture_output=True,
             text=True,
