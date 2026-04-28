@@ -1,0 +1,414 @@
+[
+  {
+    "id": 1,
+    "module": "Basics",
+    "moduleOrder": 1,
+    "order": 1,
+    "difficulty": "easy",
+    "title": "Hello World",
+    "description": "Write a program that prints **Hello, World!** to the screen.\n\nThis is the classic first program in any language!",
+    "concepts": ["print"],
+    "hints": [
+      "Use the print() function",
+      "Put your text inside quotes: print(\"Hello, World!\")"
+    ],
+    "examples": [
+      { "input": "", "output": "Hello, World!" }
+    ],
+    "testCases": [
+      { "input": "", "expectedOutput": "Hello, World!" }
+    ],
+    "starterCode": "# Write your code here\n# Print \"Hello, World!\" to the screen\n"
+  },
+  {
+    "id": 2,
+    "module": "Basics",
+    "moduleOrder": 1,
+    "order": 2,
+    "difficulty": "easy",
+    "title": "Greet the User",
+    "description": "Write a program that reads a **name** from input and prints a greeting in the format:\n**Hello, {name}!**",
+    "concepts": ["input", "print", "string concatenation"],
+    "hints": [
+      "Use input() to read the name",
+      "Use an f-string: f\"Hello, {name}!\"",
+      "Or use concatenation: \"Hello, \" + name + \"!\""
+    ],
+    "examples": [
+      { "input": "Alice", "output": "Hello, Alice!" }
+    ],
+    "testCases": [
+      { "input": "Alice", "expectedOutput": "Hello, Alice!" },
+      { "input": "World", "expectedOutput": "Hello, World!" },
+      { "input": "Python", "expectedOutput": "Hello, Python!" }
+    ],
+    "starterCode": "# Write your code here\n# Read a name and print a greeting\n"
+  },
+  {
+    "id": 3,
+    "module": "Basics",
+    "moduleOrder": 1,
+    "order": 3,
+    "difficulty": "easy",
+    "title": "Simple Calculator",
+    "description": "Read two integers from input (one per line) and print their **sum**, **difference**, and **product**, each on a new line.",
+    "concepts": ["input", "int", "arithmetic"],
+    "hints": [
+      "Use int(input()) to read numbers",
+      "Store them in variables a and b",
+      "Print a+b, a-b, and a*b on separate lines"
+    ],
+    "examples": [
+      { "input": "10\n3", "output": "13\n7\n30" }
+    ],
+    "testCases": [
+      { "input": "10\n3", "expectedOutput": "13\n7\n30" },
+      { "input": "5\n5", "expectedOutput": "10\n0\n25" },
+      { "input": "0\n7", "expectedOutput": "7\n-7\n0" }
+    ],
+    "starterCode": "# Write your code here\n# Read two numbers and print sum, difference, product\n"
+  },
+  {
+    "id": 4,
+    "module": "Control Flow",
+    "moduleOrder": 2,
+    "order": 1,
+    "difficulty": "easy",
+    "title": "Even or Odd",
+    "description": "Read an integer from input and print **\"Even\"** if it's even, or **\"Odd\"** if it's odd.",
+    "concepts": ["if/else", "modulo"],
+    "hints": [
+      "Use the modulo operator: number % 2",
+      "If the remainder is 0, the number is even"
+    ],
+    "examples": [
+      { "input": "4", "output": "Even" },
+      { "input": "7", "output": "Odd" }
+    ],
+    "testCases": [
+      { "input": "4", "expectedOutput": "Even" },
+      { "input": "7", "expectedOutput": "Odd" },
+      { "input": "0", "expectedOutput": "Even" },
+      { "input": "-3", "expectedOutput": "Odd" }
+    ],
+    "starterCode": "# Write your code here\n# Read a number and print Even or Odd\n"
+  },
+  {
+    "id": 5,
+    "module": "Control Flow",
+    "moduleOrder": 2,
+    "order": 2,
+    "difficulty": "easy",
+    "title": "Grade Calculator",
+    "description": "Read a score (0–100) from input and print the grade:\n- **90–100**: A\n- **80–89**: B\n- **70–79**: C\n- **60–69**: D\n- **Below 60**: F",
+    "concepts": ["if/elif/else", "comparison"],
+    "hints": [
+      "Use if/elif/else chain",
+      "Check from highest to lowest: if score >= 90, elif score >= 80, etc."
+    ],
+    "examples": [
+      { "input": "85", "output": "B" },
+      { "input": "42", "output": "F" }
+    ],
+    "testCases": [
+      { "input": "95", "expectedOutput": "A" },
+      { "input": "85", "expectedOutput": "B" },
+      { "input": "72", "expectedOutput": "C" },
+      { "input": "65", "expectedOutput": "D" },
+      { "input": "42", "expectedOutput": "F" }
+    ],
+    "starterCode": "# Write your code here\n# Read a score and print the letter grade\n"
+  },
+  {
+    "id": 6,
+    "module": "Control Flow",
+    "moduleOrder": 2,
+    "order": 3,
+    "difficulty": "medium",
+    "title": "FizzBuzz",
+    "description": "Read a number **N** and print the numbers from 1 to N, but:\n- For multiples of 3, print **\"Fizz\"**\n- For multiples of 5, print **\"Buzz\"**\n- For multiples of both 3 and 5, print **\"FizzBuzz\"**",
+    "concepts": ["for loop", "modulo", "if/elif"],
+    "hints": [
+      "Use a for loop with range(1, n+1)",
+      "Check divisibility by 15 first (both 3 and 5)",
+      "Then check 3, then 5, then just print the number"
+    ],
+    "examples": [
+      { "input": "15", "output": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz" }
+    ],
+    "testCases": [
+      { "input": "5", "expectedOutput": "1\n2\nFizz\n4\nBuzz" },
+      { "input": "15", "expectedOutput": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz" }
+    ],
+    "starterCode": "# Write your code here\n# Read N and print FizzBuzz from 1 to N\n"
+  },
+  {
+    "id": 7,
+    "module": "Loops",
+    "moduleOrder": 3,
+    "order": 1,
+    "difficulty": "easy",
+    "title": "Sum of Even Numbers",
+    "description": "Read a number **N**, then read **N** integers, and print the **sum of all even numbers** among them.\n\n**Hint:** Use the modulo operator `%` to check if a number is even.",
+    "concepts": ["for loop", "modulo", "accumulator"],
+    "hints": [
+      "Initialize a sum variable to 0",
+      "Loop N times, reading a number each time",
+      "If number % 2 == 0, add it to the sum"
+    ],
+    "examples": [
+      { "input": "5\n1\n2\n3\n4\n5", "output": "6" }
+    ],
+    "testCases": [
+      { "input": "5\n1\n2\n3\n4\n5", "expectedOutput": "6" },
+      { "input": "3\n2\n4\n6", "expectedOutput": "12" },
+      { "input": "4\n1\n3\n5\n7", "expectedOutput": "0" }
+    ],
+    "starterCode": "# Write your code here\n# Read N, then read N numbers\n# Print the sum of even numbers\n"
+  },
+  {
+    "id": 8,
+    "module": "Loops",
+    "moduleOrder": 3,
+    "order": 2,
+    "difficulty": "medium",
+    "title": "Collect Names",
+    "description": "Write a program that keeps asking the user to enter names. When the user types **\"show\"**, the program should stop asking and print all the names entered so far, each on a new line.\n\n**Hint:** Use a `while` loop and `input()` function.",
+    "concepts": ["while loop", "lists", "break"],
+    "hints": [
+      "Use a while True loop",
+      "Read input each iteration",
+      "If input is 'show', break out of the loop",
+      "Otherwise, append to a list, then print with '\\n'.join()"
+    ],
+    "examples": [
+      { "input": "Alice\nBob\nCharlie\nshow", "output": "Alice\nBob\nCharlie" }
+    ],
+    "testCases": [
+      { "input": "Alice\nBob\nCharlie\nshow", "expectedOutput": "Alice\nBob\nCharlie" },
+      { "input": "Zara\nshow", "expectedOutput": "Zara" },
+      { "input": "show", "expectedOutput": "" }
+    ],
+    "starterCode": "# Write your code here\n# Keep asking for names until 'show' is entered\n# Then print all the names\n"
+  },
+  {
+    "id": 9,
+    "module": "Loops",
+    "moduleOrder": 3,
+    "order": 3,
+    "difficulty": "medium",
+    "title": "Multiplication Table",
+    "description": "Read a number **N** and print its multiplication table from 1 to 10.\n\nFormat each line as: **N x i = result**",
+    "concepts": ["for loop", "range", "f-string"],
+    "hints": [
+      "Use a for loop with range(1, 11)",
+      "Use an f-string: f\"{n} x {i} = {n*i}\""
+    ],
+    "examples": [
+      { "input": "5", "output": "5 x 1 = 5\n5 x 2 = 10\n5 x 3 = 15\n5 x 4 = 20\n5 x 5 = 25\n5 x 6 = 30\n5 x 7 = 35\n5 x 8 = 40\n5 x 9 = 45\n5 x 10 = 50" }
+    ],
+    "testCases": [
+      { "input": "5", "expectedOutput": "5 x 1 = 5\n5 x 2 = 10\n5 x 3 = 15\n5 x 4 = 20\n5 x 5 = 25\n5 x 6 = 30\n5 x 7 = 35\n5 x 8 = 40\n5 x 9 = 45\n5 x 10 = 50" },
+      { "input": "3", "expectedOutput": "3 x 1 = 3\n3 x 2 = 6\n3 x 3 = 9\n3 x 4 = 12\n3 x 5 = 15\n3 x 6 = 18\n3 x 7 = 21\n3 x 8 = 24\n3 x 9 = 27\n3 x 10 = 30" }
+    ],
+    "starterCode": "# Write your code here\n# Read N and print its multiplication table\n"
+  },
+  {
+    "id": 10,
+    "module": "Strings",
+    "moduleOrder": 4,
+    "order": 1,
+    "difficulty": "easy",
+    "title": "Reverse a String",
+    "description": "Read a string from input and print the **reversed version** of that string.\n\n**Hint:** Python strings support slicing with a step value.",
+    "concepts": ["string slicing", "indexing"],
+    "hints": [
+      "You can reverse a string with slicing: s[::-1]",
+      "Or use a loop to build the reversed string"
+    ],
+    "examples": [
+      { "input": "hello", "output": "olleh" }
+    ],
+    "testCases": [
+      { "input": "hello", "expectedOutput": "olleh" },
+      { "input": "Python", "expectedOutput": "nohtyP" },
+      { "input": "racecar", "expectedOutput": "racecar" }
+    ],
+    "starterCode": "# Write your code here\n# Read a string and print it reversed\n"
+  },
+  {
+    "id": 11,
+    "module": "Strings",
+    "moduleOrder": 4,
+    "order": 2,
+    "difficulty": "medium",
+    "title": "Count Vowels",
+    "description": "Read a string and print how many **vowels** (a, e, i, o, u) it contains.\n\nCount both uppercase and lowercase vowels.",
+    "concepts": ["string iteration", "lower()", "in operator"],
+    "hints": [
+      "Convert the string to lowercase first",
+      "Loop through each character",
+      "Check if it's in 'aeiou'"
+    ],
+    "examples": [
+      { "input": "Hello World", "output": "3" }
+    ],
+    "testCases": [
+      { "input": "Hello World", "expectedOutput": "3" },
+      { "input": "Python", "expectedOutput": "1" },
+      { "input": "AEIOU", "expectedOutput": "5" },
+      { "input": "xyz", "expectedOutput": "0" }
+    ],
+    "starterCode": "# Write your code here\n# Read a string and count the vowels\n"
+  },
+  {
+    "id": 12,
+    "module": "Strings",
+    "moduleOrder": 4,
+    "order": 3,
+    "difficulty": "medium",
+    "title": "Palindrome Check",
+    "description": "Read a string and print **\"Yes\"** if it reads the same forwards and backwards (case-insensitive), otherwise print **\"No\"**.",
+    "concepts": ["string slicing", "lower()", "comparison"],
+    "hints": [
+      "Convert to lowercase first",
+      "Compare the string with its reverse",
+      "s.lower() == s.lower()[::-1]"
+    ],
+    "examples": [
+      { "input": "Racecar", "output": "Yes" },
+      { "input": "Hello", "output": "No" }
+    ],
+    "testCases": [
+      { "input": "Racecar", "expectedOutput": "Yes" },
+      { "input": "Hello", "expectedOutput": "No" },
+      { "input": "madam", "expectedOutput": "Yes" },
+      { "input": "Level", "expectedOutput": "Yes" }
+    ],
+    "starterCode": "# Write your code here\n# Read a string and check if it's a palindrome\n"
+  },
+  {
+    "id": 13,
+    "module": "Lists",
+    "moduleOrder": 5,
+    "order": 1,
+    "difficulty": "easy",
+    "title": "Find the Maximum",
+    "description": "Read **N**, then read **N** integers. Print the **largest number** among them.\n\nDo **not** use the built-in `max()` function.",
+    "concepts": ["lists", "comparison", "loop"],
+    "hints": [
+      "Read all numbers into a list",
+      "Set the first number as the current max",
+      "Loop through the rest, update max if you find a larger one"
+    ],
+    "examples": [
+      { "input": "5\n3\n7\n2\n9\n1", "output": "9" }
+    ],
+    "testCases": [
+      { "input": "5\n3\n7\n2\n9\n1", "expectedOutput": "9" },
+      { "input": "3\n-1\n-5\n-2", "expectedOutput": "-1" },
+      { "input": "1\n42", "expectedOutput": "42" }
+    ],
+    "starterCode": "# Write your code here\n# Read N numbers and find the largest (no max())\n"
+  },
+  {
+    "id": 14,
+    "module": "Lists",
+    "moduleOrder": 5,
+    "order": 2,
+    "difficulty": "medium",
+    "title": "Remove Duplicates",
+    "description": "Read **N**, then read **N** integers. Print the unique numbers in the **order they first appeared**, each on a new line.",
+    "concepts": ["lists", "set logic", "order preservation"],
+    "hints": [
+      "Use a list to track seen numbers",
+      "Only add a number if it's not already in the seen list",
+      "Print each unique number"
+    ],
+    "examples": [
+      { "input": "7\n3\n1\n3\n5\n1\n7\n3", "output": "3\n1\n5\n7" }
+    ],
+    "testCases": [
+      { "input": "7\n3\n1\n3\n5\n1\n7\n3", "expectedOutput": "3\n1\n5\n7" },
+      { "input": "4\n1\n2\n3\n4", "expectedOutput": "1\n2\n3\n4" },
+      { "input": "3\n5\n5\n5", "expectedOutput": "5" }
+    ],
+    "starterCode": "# Write your code here\n# Read N numbers and print unique ones in order\n"
+  },
+  {
+    "id": 15,
+    "module": "Functions",
+    "moduleOrder": 6,
+    "order": 1,
+    "difficulty": "medium",
+    "title": "Factorial",
+    "description": "Read a non-negative integer **N** and print its **factorial** (N!).\n\nRecall: 0! = 1, and N! = 1 × 2 × 3 × ... × N",
+    "concepts": ["functions", "loops", "recursion"],
+    "hints": [
+      "Define a function factorial(n)",
+      "Use a loop or recursion",
+      "Don't forget: 0! = 1"
+    ],
+    "examples": [
+      { "input": "5", "output": "120" },
+      { "input": "0", "output": "1" }
+    ],
+    "testCases": [
+      { "input": "5", "expectedOutput": "120" },
+      { "input": "0", "expectedOutput": "1" },
+      { "input": "1", "expectedOutput": "1" },
+      { "input": "10", "expectedOutput": "3628800" }
+    ],
+    "starterCode": "# Write your code here\n# Define a factorial function and use it\n"
+  },
+  {
+    "id": 16,
+    "module": "Functions",
+    "moduleOrder": 6,
+    "order": 2,
+    "difficulty": "medium",
+    "title": "Is Prime?",
+    "description": "Read an integer **N** (N ≥ 2) and print **\"Yes\"** if it's a prime number, otherwise **\"No\"**.\n\nA prime number is only divisible by 1 and itself.",
+    "concepts": ["functions", "loops", "optimization"],
+    "hints": [
+      "Check divisibility from 2 to sqrt(N)",
+      "If any number divides N evenly, it's not prime",
+      "Import math and use math.isqrt(n) for the square root"
+    ],
+    "examples": [
+      { "input": "7", "output": "Yes" },
+      { "input": "12", "output": "No" }
+    ],
+    "testCases": [
+      { "input": "7", "expectedOutput": "Yes" },
+      { "input": "12", "expectedOutput": "No" },
+      { "input": "2", "expectedOutput": "Yes" },
+      { "input": "1000000007", "expectedOutput": "Yes" }
+    ],
+    "starterCode": "# Write your code here\n# Check if N is a prime number\n"
+  },
+  {
+    "id": 17,
+    "module": "Functions",
+    "moduleOrder": 6,
+    "order": 3,
+    "difficulty": "hard",
+    "title": "Fibonacci Sequence",
+    "description": "Read an integer **N** and print the first **N** numbers of the Fibonacci sequence, each on a new line.\n\nThe Fibonacci sequence starts: 0, 1, 1, 2, 3, 5, 8, 13, ...",
+    "concepts": ["functions", "loops", "sequences"],
+    "hints": [
+      "Start with a=0 and b=1",
+      "In each step: print a, then set a, b = b, a+b",
+      "Repeat N times"
+    ],
+    "examples": [
+      { "input": "7", "output": "0\n1\n1\n2\n3\n5\n8" }
+    ],
+    "testCases": [
+      { "input": "7", "expectedOutput": "0\n1\n1\n2\n3\n5\n8" },
+      { "input": "1", "expectedOutput": "0" },
+      { "input": "5", "expectedOutput": "0\n1\n1\n2\n3" }
+    ],
+    "starterCode": "# Write your code here\n# Print the first N Fibonacci numbers\n"
+  }
+]
