@@ -22,16 +22,24 @@ import os
 PROBLEMS_PATH = Path(os.getenv("PROBLEMS_PATH", "problems.json"))
 
 def load_problems():
-    if not PROBLEMS_PATH.exists():
-        # Fallback to looking in the root if we're inside /app
-        alt_path = Path("/app/problems.json")
-        if alt_path.exists():
-            with open(alt_path, "r") as f:
-                return json.load(f)
-        raise FileNotFoundError(f"❌ Could not find problems.json at {PROBLEMS_PATH} or {alt_path}")
-    
-    with open(PROBLEMS_PATH, "r") as f:
-        return json.load(f)
+    # Priority 1: Environment Variable
+    if PROBLEMS_PATH.exists():
+        with open(PROBLEMS_PATH, "r") as f:
+            return json.load(f)
+            
+    # Priority 2: Parent directory (Local/Droplet mode)
+    parent_path = Path(__file__).parent.parent / "problems.json"
+    if parent_path.exists():
+        with open(parent_path, "r") as f:
+            return json.load(f)
+
+    # Priority 3: Docker absolute path
+    docker_path = Path("/app/problems.json")
+    if docker_path.exists():
+        with open(docker_path, "r") as f:
+            return json.load(f)
+            
+    raise FileNotFoundError(f"❌ Could not find problems.json. Tried: {PROBLEMS_PATH}, {parent_path}, {docker_path}")
 
 
 # ---------- Models ----------
