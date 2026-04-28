@@ -5,7 +5,9 @@ import dynamic from "next/dynamic";
 
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
-const API_BASE = "http://localhost:8000";
+const API_BASE = typeof window !== "undefined" 
+  ? `${window.location.protocol}//${window.location.hostname}:8000` 
+  : "http://localhost:8000";
 const STORAGE_KEY = "codepractice_progress";
 
 // ─── localStorage helpers ───

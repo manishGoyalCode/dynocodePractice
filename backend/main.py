@@ -8,10 +8,10 @@ from pydantic import BaseModel
 
 app = FastAPI(title="DynoCode API")
 
-# CORS for Next.js frontend
+# CORS for Frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"], # Allows all origins for VM/Remote deployment
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
