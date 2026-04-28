@@ -8,6 +8,14 @@ from pydantic import BaseModel
 
 app = FastAPI(title="DynoCode API")
 
+@app.get("/health")
+def health_check():
+    try:
+        problems = load_problems()
+        return {"status": "healthy", "problems_count": len(problems)}
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}, 500
+
 # CORS for Frontend
 app.add_middleware(
     CORSMiddleware,
