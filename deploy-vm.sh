@@ -5,6 +5,11 @@
 
 echo "⏱ Starting Fast Deployment..."
 
+# --- 0. Cleanup ---
+echo "🧹 Cleaning up old processes on ports 3000 and 8000..."
+lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+
 # --- 1. Backend Setup ---
 echo "🐍 Setting up Python Backend..."
 cd backend
