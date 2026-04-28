@@ -5,9 +5,15 @@ import dynamic from "next/dynamic";
 
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" 
+let API_BASE = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" 
   ? `${window.location.protocol}//${window.location.hostname}:8000` 
   : "http://localhost:8000");
+
+// Ensure API_BASE starts with http:// or https://
+if (API_BASE && !API_BASE.startsWith('http')) {
+  API_BASE = `http://${API_BASE}`;
+}
+
 const STORAGE_KEY = "codepractice_progress";
 
 // ─── localStorage helpers ───
