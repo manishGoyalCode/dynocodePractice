@@ -19,9 +19,17 @@ app.add_middleware(
 
 import os
 # Load problems from JSON
-PROBLEMS_PATH = Path(os.getenv("PROBLEMS_PATH", Path(__file__).parent.parent / "problems.json"))
+PROBLEMS_PATH = Path(os.getenv("PROBLEMS_PATH", "problems.json"))
 
 def load_problems():
+    if not PROBLEMS_PATH.exists():
+        # Fallback to looking in the root if we're inside /app
+        alt_path = Path("/app/problems.json")
+        if alt_path.exists():
+            with open(alt_path, "r") as f:
+                return json.load(f)
+        raise FileNotFoundError(f"❌ Could not find problems.json at {PROBLEMS_PATH} or {alt_path}")
+    
     with open(PROBLEMS_PATH, "r") as f:
         return json.load(f)
 
