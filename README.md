@@ -1,6 +1,23 @@
-# ⚡ CodePractice — Learn Python by Doing
+# ⚡ DynoCode — Learn Python by Doing
 
 A beginner-friendly coding practice platform with an interactive code editor, instant execution, and automated test cases.
+
+## 🚀 Fast Deployment (Docker)
+
+To deploy the entire stack on your VM in one command:
+
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+This will:
+- Build optimized images for Backend and Frontend.
+- Map the frontend to port `3000`.
+- Map the backend to port `8000`.
+- Mount `problems.json` as a volume for easy content updates.
+
+---
 
 ## Tech Stack
 
@@ -9,7 +26,7 @@ A beginner-friendly coding practice platform with an interactive code editor, in
 | Frontend | Next.js (React)   |
 | Editor   | Monaco Editor     |
 | Backend  | FastAPI (Python)   |
-| Storage  | JSON (in-memory)  |
+| Storage  | JSON (Local File) |
 | Execution| Python subprocess |
 
 ## Project Structure
@@ -18,18 +35,18 @@ A beginner-friendly coding practice platform with an interactive code editor, in
 pythonLearning/
 ├── backend/
 │   ├── main.py              # FastAPI server
-│   └── requirements.txt     # Python dependencies
+│   ├── requirements.txt     # Python dependencies
+│   └── Dockerfile           # Optimized backend image
 ├── frontend/
-│   ├── app/
-│   │   ├── globals.css      # Design system
-│   │   ├── layout.js        # Root layout
-│   │   └── page.js          # Main page component
-│   └── package.json
+│   ├── app/                 # Next.js code
+│   └── Dockerfile           # Multi-stage production image
 ├── problems.json            # Problem definitions + test cases
+├── docker-compose.yml       # Orchestration
+├── deploy.sh                # One-click deployment
 └── README.md
 ```
 
-## Getting Started
+## Manual Getting Started
 
 ### 1. Start the Backend
 
@@ -39,8 +56,6 @@ pip3 install -r requirements.txt
 python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Backend will run at **http://localhost:8000**
-
 ### 2. Start the Frontend
 
 ```bash
@@ -49,42 +64,17 @@ npm install
 npm run dev
 ```
 
-Frontend will run at **http://localhost:3000**
-
-### 3. Open in Browser
-
-Navigate to **http://localhost:3000** to start coding!
-
 ## Features
 
-- 📋 **Problem Descriptions** — Read the problem, see examples
-- ✏️ **Monaco Code Editor** — VS Code-like editing experience
-- ▶️ **Run Code** — Execute your Python code with custom input
-- 🚀 **Submit** — Run against hidden test cases and see pass/fail
-- 📊 **Test Results** — See expected vs actual output for each test case
-- ⏰ **Timeout Protection** — 2-second limit prevents infinite loops
-- 🎨 **Dark Theme** — Easy on the eyes
+- 🏠 **Dashboard** — Track progress, streaks, and module completion.
+- 📖 **Concept Cards** — Mini-lessons integrated into problems.
+- 🔓 **Reference Solutions** — Unlock solutions after 3 attempts or a successful solve.
+- ✏️ **Monaco Code Editor** — VS Code-like experience.
+- 🚀 **Test Cases** — Real-time validation against hidden cases.
+- 📊 **Responsive Layout** — Works across different screen sizes.
+- ⏰ **Timeout Protection** — Secure execution with limits.
 
-## API Reference
+## 📂 Content Management
 
-| Endpoint        | Method | Description                    |
-|-----------------|--------|--------------------------------|
-| `/problems`     | GET    | List all problems              |
-| `/problems/:id` | GET    | Get a single problem           |
-| `/run`          | POST   | Execute code with custom input |
-| `/submit`       | POST   | Submit code against test cases |
+Edit `problems.json` to add or modify problems. The backend automatically picks up changes. See `problems.md` for the full schema guide.
 
-## Adding New Problems
-
-Edit `problems.json` to add new problems. Each problem needs:
-
-```json
-{
-  "id": 4,
-  "title": "Your Problem Title",
-  "description": "Problem description with **markdown** support",
-  "examples": [{ "input": "...", "output": "..." }],
-  "testCases": [{ "input": "...", "expectedOutput": "..." }],
-  "starterCode": "# Write your code here\n"
-}
-```

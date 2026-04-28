@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-app = FastAPI(title="CodePractice API")
+app = FastAPI(title="DynoCode API")
 
 # CORS for Next.js frontend
 app.add_middleware(
@@ -17,8 +17,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
 # Load problems from JSON
-PROBLEMS_PATH = Path(__file__).parent.parent / "problems.json"
+PROBLEMS_PATH = Path(os.getenv("PROBLEMS_PATH", Path(__file__).parent.parent / "problems.json"))
 
 def load_problems():
     with open(PROBLEMS_PATH, "r") as f:

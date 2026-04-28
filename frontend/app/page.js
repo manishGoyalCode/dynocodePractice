@@ -76,7 +76,7 @@ export default function Home() {
   const [revealedHints, setRevealedHints] = useState([]);
   const [showConfetti, setShowConfetti] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [conceptExpanded, setConceptExpanded] = useState(true);
+  const [conceptExpanded, setConceptExpanded] = useState(false);
   const mainRef = useRef(null);
   const autoSaveTimer = useRef(null);
 
@@ -175,7 +175,7 @@ export default function Home() {
     setOutputError(false);
     setLeftTab("description");
     setRevealedHints([]);
-    setConceptExpanded(true);
+    setConceptExpanded(false);
     setView("problem");
   };
 
@@ -347,7 +347,7 @@ export default function Home() {
             }}
           >
             <span className="navbar-logo-icon">⚡</span>
-            CodePractice
+            DynoCode
           </a>
         </div>
         <div className="navbar-progress">
