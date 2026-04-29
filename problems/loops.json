@@ -132,5 +132,117 @@
       }
     ],
     "starterCode": "# Write your code here\n# Read N and print its multiplication table\n"
+  },
+  {
+    "id": 20,
+    "module": "Loops",
+    "moduleOrder": 3,
+    "order": 4,
+    "difficulty": "easy",
+    "title": "Sum of Digits",
+    "description": "Read a non-negative integer from input and print the **sum of its digits**.\n\nFor example, the digits of `123` are `1, 2, 3` and their sum is `6`.",
+    "concepts": [
+      "while",
+      "modulo",
+      "integer division"
+    ],
+    "conceptLesson": {
+      "title": "Peeling Off Digits with `% 10` and `// 10`",
+      "content": "`n % 10` gives you the last digit. `n // 10` removes the last digit. Repeat until `n` is `0`.",
+      "code": "n = 423\nlast = n % 10   # 3\nrest = n // 10  # 42"
+    },
+    "hints": [
+      "Use a `while` loop that runs while `n > 0`.",
+      "`n % 10` gives the last digit.",
+      "Don't forget to update `n` with `n //= 10`."
+    ],
+    "solution": "n = int(input())\ntotal = 0\nwhile n > 0:\n    total += n % 10\n    n //= 10\nprint(total)",
+    "examples": [
+      {
+        "input": "123",
+        "output": "6"
+      },
+      {
+        "input": "9876",
+        "output": "30"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "123",
+        "expectedOutput": "6"
+      },
+      {
+        "input": "9",
+        "expectedOutput": "9"
+      },
+      {
+        "input": "0",
+        "expectedOutput": "0"
+      },
+      {
+        "input": "9876",
+        "expectedOutput": "30"
+      },
+      {
+        "input": "1000",
+        "expectedOutput": "1"
+      }
+    ],
+    "starterCode": "# Read a non-negative integer and print the sum of its digits\n"
+  },
+  {
+    "id": 21,
+    "module": "Loops",
+    "moduleOrder": 3,
+    "order": 5,
+    "difficulty": "hard",
+    "title": "Print Primes Up to N",
+    "description": "Read an integer `N` from input. Print every **prime number** from `2` up to `N` (inclusive), one per line.\n\nIf `N < 2`, print nothing.",
+    "concepts": [
+      "nested loops",
+      "break",
+      "primality"
+    ],
+    "conceptLesson": {
+      "title": "Checking Primality",
+      "content": "A number is prime if no integer from `2` up to `sqrt(n)` divides it evenly. Using `sqrt(n)` instead of `n` makes the check much faster.",
+      "code": "k = 29\nfor d in range(2, int(k**0.5) + 1):\n    if k % d == 0:\n        print('not prime')\n        break\nelse:\n    print('prime')"
+    },
+    "hints": [
+      "Loop `k` from 2 to N inclusive — use `range(2, N + 1)`.",
+      "For each `k`, check divisibility against `2..int(k**0.5)+1`.",
+      "Use a flag like `is_prime` and `break` early when a divisor is found."
+    ],
+    "solution": "n = int(input())\nfor k in range(2, n + 1):\n    is_prime = True\n    for d in range(2, int(k**0.5) + 1):\n        if k % d == 0:\n            is_prime = False\n            break\n    if is_prime:\n        print(k)",
+    "examples": [
+      {
+        "input": "10",
+        "output": "2\n3\n5\n7"
+      },
+      {
+        "input": "2",
+        "output": "2"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "10",
+        "expectedOutput": "2\n3\n5\n7"
+      },
+      {
+        "input": "2",
+        "expectedOutput": "2"
+      },
+      {
+        "input": "1",
+        "expectedOutput": ""
+      },
+      {
+        "input": "20",
+        "expectedOutput": "2\n3\n5\n7\n11\n13\n17\n19"
+      }
+    ],
+    "starterCode": "# Read N and print each prime from 2..N on its own line\n"
   }
 ]

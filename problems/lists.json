@@ -90,5 +90,63 @@
       }
     ],
     "starterCode": "# Write your code here\n# Read N numbers and print unique ones in order\n"
+  },
+  {
+    "id": 24,
+    "module": "Lists",
+    "moduleOrder": 5,
+    "order": 3,
+    "difficulty": "easy",
+    "title": "Sum of List",
+    "description": "Read a single line of space-separated integers and print their **sum**.\n\nIf the line is empty, print `0`.",
+    "concepts": [
+      "split",
+      "map",
+      "sum"
+    ],
+    "conceptLesson": {
+      "title": "Parsing Numbers from a Line",
+      "content": "`input().split()` returns a list of strings split by whitespace. Use `map(int, ...)` to convert them all to integers in one go.",
+      "code": "nums = list(map(int, '1 2 3'.split()))\nprint(sum(nums))  # 6"
+    },
+    "hints": [
+      "Use `input().split()` to break the line into pieces.",
+      "Use `map(int, ...)` to convert the pieces to integers.",
+      "Use the built-in `sum()` to add them up."
+    ],
+    "solution": "nums = list(map(int, input().split()))\nprint(sum(nums))",
+    "examples": [
+      {
+        "input": "1 2 3 4 5",
+        "output": "15"
+      },
+      {
+        "input": "10",
+        "output": "10"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "1 2 3 4 5",
+        "expectedOutput": "15"
+      },
+      {
+        "input": "10",
+        "expectedOutput": "10"
+      },
+      {
+        "input": "1 1 1 1 1",
+        "expectedOutput": "5"
+      },
+      {
+        "input": "-5 5",
+        "expectedOutput": "0"
+      },
+      {
+        "input": "100 200 300",
+        "expectedOutput": "600"
+      }
+    ],
+    "starterCode": "# Read space-separated integers and print the sum\n"
   }
 ]

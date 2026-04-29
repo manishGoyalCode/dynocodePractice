@@ -148,5 +148,64 @@
       }
     ],
     "starterCode": "# Write your code here\n# Read N and print FizzBuzz from 1 to N\n"
+  },
+  {
+    "id": 19,
+    "module": "Control Flow",
+    "moduleOrder": 2,
+    "order": 4,
+    "difficulty": "medium",
+    "title": "Leap Year",
+    "description": "Read a year from input. Print `Leap` if it is a leap year, otherwise print `Not Leap`.\n\nA year is a **leap year** if it is divisible by 4, **except** when it is divisible by 100, **unless** it is also divisible by 400.",
+    "concepts": [
+      "if",
+      "elif",
+      "else",
+      "modulo"
+    ],
+    "conceptLesson": {
+      "title": "Chained Conditions",
+      "content": "Sometimes a rule has multiple exceptions. Combine conditions with `and` / `or`, or use nested `if` statements to express them clearly.",
+      "code": "y = 2000\nif (y % 4 == 0 and y % 100 != 0) or y % 400 == 0:\n    print('Leap')\nelse:\n    print('Not Leap')"
+    },
+    "hints": [
+      "Use the modulo operator `%` to test divisibility.",
+      "Divisible by 4 — but not 100 — is a leap year.",
+      "Years divisible by 400 are always leap years (e.g. 2000)."
+    ],
+    "solution": "y = int(input())\nif (y % 4 == 0 and y % 100 != 0) or y % 400 == 0:\n    print('Leap')\nelse:\n    print('Not Leap')",
+    "examples": [
+      {
+        "input": "2020",
+        "output": "Leap"
+      },
+      {
+        "input": "1900",
+        "output": "Not Leap"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "2000",
+        "expectedOutput": "Leap"
+      },
+      {
+        "input": "2020",
+        "expectedOutput": "Leap"
+      },
+      {
+        "input": "1900",
+        "expectedOutput": "Not Leap"
+      },
+      {
+        "input": "2023",
+        "expectedOutput": "Not Leap"
+      },
+      {
+        "input": "1600",
+        "expectedOutput": "Leap"
+      }
+    ],
+    "starterCode": "# Read a year and print 'Leap' or 'Not Leap'\n"
   }
 ]

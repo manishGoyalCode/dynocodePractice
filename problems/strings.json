@@ -146,5 +146,122 @@
       }
     ],
     "starterCode": "# Write your code here\n# Read a string and check if it's a palindrome\n"
+  },
+  {
+    "id": 22,
+    "module": "Strings",
+    "moduleOrder": 4,
+    "order": 4,
+    "difficulty": "medium",
+    "title": "Anagram Check",
+    "description": "Read two strings (one per line). Print `Yes` if they are **anagrams** of each other, otherwise `No`.\n\nIgnore case and whitespace. Two strings are anagrams when they contain the same letters in any order.",
+    "concepts": [
+      "strings",
+      "sorted",
+      "case folding"
+    ],
+    "conceptLesson": {
+      "title": "Comparing Sorted Strings",
+      "content": "Two strings are anagrams when their sorted character lists are identical. `sorted(s)` returns a list of the characters of `s` in order.",
+      "code": "print(sorted('listen') == sorted('silent'))  # True"
+    },
+    "hints": [
+      "Read both lines with `input()`.",
+      "Lowercase both strings and remove spaces before comparing.",
+      "Compare `sorted(a) == sorted(b)`."
+    ],
+    "solution": "a = input().replace(' ', '').lower()\nb = input().replace(' ', '').lower()\nprint('Yes' if sorted(a) == sorted(b) else 'No')",
+    "examples": [
+      {
+        "input": "listen\nsilent",
+        "output": "Yes"
+      },
+      {
+        "input": "hello\nworld",
+        "output": "No"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "listen\nsilent",
+        "expectedOutput": "Yes"
+      },
+      {
+        "input": "hello\nworld",
+        "expectedOutput": "No"
+      },
+      {
+        "input": "Triangle\nIntegral",
+        "expectedOutput": "Yes"
+      },
+      {
+        "input": "abc\nabd",
+        "expectedOutput": "No"
+      },
+      {
+        "input": "rail safety\nfairy tales",
+        "expectedOutput": "Yes"
+      }
+    ],
+    "starterCode": "# Read two strings on separate lines; print 'Yes' if anagrams, else 'No'\n"
+  },
+  {
+    "id": 23,
+    "module": "Strings",
+    "moduleOrder": 4,
+    "order": 5,
+    "difficulty": "hard",
+    "title": "Caesar Cipher",
+    "description": "Read a line of text and an integer `shift`. Output the text with each **letter** shifted forward by `shift` positions in the alphabet, wrapping around at the end.\n\nPreserve case. Leave non-letter characters unchanged.",
+    "concepts": [
+      "ord",
+      "chr",
+      "modulo",
+      "loops"
+    ],
+    "conceptLesson": {
+      "title": "ord() and chr()",
+      "content": "`ord(ch)` returns the integer code point of a character; `chr(n)` returns the character for a given code point. The lowercase letters `a..z` are codes `97..122`.",
+      "code": "print(ord('a'))     # 97\nprint(chr(97 + 3))  # 'd'"
+    },
+    "hints": [
+      "Loop over each character. Decide whether it is upper, lower, or non-letter.",
+      "For lowercase: `chr((ord(ch) - ord('a') + shift) % 26 + ord('a'))`.",
+      "Wrap with `% 26` so a shift of 26 leaves the text unchanged."
+    ],
+    "solution": "text = input()\nshift = int(input())\nresult = []\nfor ch in text:\n    if 'a' <= ch <= 'z':\n        result.append(chr((ord(ch) - ord('a') + shift) % 26 + ord('a')))\n    elif 'A' <= ch <= 'Z':\n        result.append(chr((ord(ch) - ord('A') + shift) % 26 + ord('A')))\n    else:\n        result.append(ch)\nprint(''.join(result))",
+    "examples": [
+      {
+        "input": "abc\n3",
+        "output": "def"
+      },
+      {
+        "input": "Hello, World!\n5",
+        "output": "Mjqqt, Btwqi!"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "abc\n3",
+        "expectedOutput": "def"
+      },
+      {
+        "input": "Hello, World!\n5",
+        "expectedOutput": "Mjqqt, Btwqi!"
+      },
+      {
+        "input": "xyz\n3",
+        "expectedOutput": "abc"
+      },
+      {
+        "input": "Caesar\n0",
+        "expectedOutput": "Caesar"
+      },
+      {
+        "input": "abc\n26",
+        "expectedOutput": "abc"
+      }
+    ],
+    "starterCode": "# Read text on line 1 and shift on line 2; print the encoded text\n"
   }
 ]

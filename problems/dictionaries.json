@@ -1,0 +1,116 @@
+[
+  {
+    "id": 26,
+    "module": "Dictionaries",
+    "moduleOrder": 7,
+    "order": 1,
+    "difficulty": "medium",
+    "title": "Word Frequency Counter",
+    "description": "Read a single line of text. For each unique word (compared case-insensitively), print `word count` on its own line.\n\nLines should be sorted **alphabetically** by word, and all words should be printed in lowercase.",
+    "concepts": [
+      "dict",
+      "split",
+      "sorted",
+      "case folding"
+    ],
+    "conceptLesson": {
+      "title": "Counting with Dictionaries",
+      "content": "A dict makes counting easy: use `counts.get(key, 0) + 1` to increment, or import `Counter` from `collections`. `sorted(d)` returns the keys in sorted order.",
+      "code": "counts = {}\nfor w in 'a b a'.split():\n    counts[w] = counts.get(w, 0) + 1\nprint(counts)  # {'a': 2, 'b': 1}"
+    },
+    "hints": [
+      "Lowercase the input first so case is ignored.",
+      "Loop over the words; use `counts.get(w, 0) + 1` to update.",
+      "Iterate over `sorted(counts)` to print in alphabetical order."
+    ],
+    "solution": "text = input().lower()\nwords = text.split()\ncounts = {}\nfor w in words:\n    counts[w] = counts.get(w, 0) + 1\nfor w in sorted(counts):\n    print(w, counts[w])",
+    "examples": [
+      {
+        "input": "the quick brown fox the lazy dog",
+        "output": "brown 1\ndog 1\nfox 1\nlazy 1\nquick 1\nthe 2"
+      },
+      {
+        "input": "hello hello world",
+        "output": "hello 2\nworld 1"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "the quick brown fox the lazy dog",
+        "expectedOutput": "brown 1\ndog 1\nfox 1\nlazy 1\nquick 1\nthe 2"
+      },
+      {
+        "input": "hello hello world",
+        "expectedOutput": "hello 2\nworld 1"
+      },
+      {
+        "input": "apple",
+        "expectedOutput": "apple 1"
+      },
+      {
+        "input": "Cat cat CAT",
+        "expectedOutput": "cat 3"
+      }
+    ],
+    "starterCode": "# Read a line and print 'word count' for each unique word, sorted alphabetically\n"
+  },
+  {
+    "id": 27,
+    "module": "Dictionaries",
+    "moduleOrder": 7,
+    "order": 2,
+    "difficulty": "medium",
+    "title": "Merge Dictionaries",
+    "description": "Read two dictionaries on two lines. Each dictionary is a list of `key:value` pairs separated by commas, e.g. `a:1,b:2`. Values are integers.\n\nMerge them: if a key appears in both, **sum** the values. Print every key in the merged dict on its own line as `key:value`, sorted alphabetically by key.\n\nAn empty line represents an empty dictionary.",
+    "concepts": [
+      "dict",
+      "split",
+      "get with default",
+      "sorted"
+    ],
+    "conceptLesson": {
+      "title": "Merging Dictionaries",
+      "content": "To merge two dicts and combine overlapping keys, start from one dict and update from the other. Use `merged.get(k, 0) + v` to safely add values whether or not the key already exists.",
+      "code": "a = {'x': 1, 'y': 2}\nb = {'y': 5, 'z': 3}\nout = dict(a)\nfor k, v in b.items():\n    out[k] = out.get(k, 0) + v\nprint(out)  # {'x': 1, 'y': 7, 'z': 3}"
+    },
+    "hints": [
+      "Write a small parser that splits on `,` and then `:`.",
+      "Handle the case where a line is empty — return an empty dict.",
+      "When merging, use `merged.get(k, 0) + v` so missing keys default to 0."
+    ],
+    "solution": "def parse(s):\n    d = {}\n    if s.strip():\n        for pair in s.split(','):\n            k, v = pair.split(':')\n            d[k.strip()] = int(v)\n    return d\n\nd1 = parse(input())\nd2 = parse(input())\nmerged = dict(d1)\nfor k, v in d2.items():\n    merged[k] = merged.get(k, 0) + v\nfor k in sorted(merged):\n    print(f'{k}:{merged[k]}')",
+    "examples": [
+      {
+        "input": "a:1,b:2\nc:3,d:4",
+        "output": "a:1\nb:2\nc:3\nd:4"
+      },
+      {
+        "input": "x:5\nx:10",
+        "output": "x:15"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "a:1,b:2\nc:3,d:4",
+        "expectedOutput": "a:1\nb:2\nc:3\nd:4"
+      },
+      {
+        "input": "x:5\nx:10",
+        "expectedOutput": "x:15"
+      },
+      {
+        "input": "apple:1,banana:2\nbanana:3,cherry:1",
+        "expectedOutput": "apple:1\nbanana:5\ncherry:1"
+      },
+      {
+        "input": "a:1\n\n",
+        "expectedOutput": "a:1"
+      },
+      {
+        "input": "\nb:2",
+        "expectedOutput": "b:2"
+      }
+    ],
+    "starterCode": "# Parse two key:value lines, merge by summing on duplicate keys, print sorted\n"
+  }
+]

@@ -152,5 +152,64 @@
       }
     ],
     "starterCode": "# Write your code here\n# Print the first N Fibonacci numbers\n"
+  },
+  {
+    "id": 25,
+    "module": "Functions",
+    "moduleOrder": 6,
+    "order": 4,
+    "difficulty": "easy",
+    "title": "Average Calculator",
+    "description": "Define a function `average(nums)` that returns the **mean** of a list of numbers.\n\nRead a line of space-separated numbers, call your function, and print the result rounded to 2 decimals.",
+    "concepts": [
+      "def",
+      "return",
+      "list",
+      "round"
+    ],
+    "conceptLesson": {
+      "title": "Functions That Return Values",
+      "content": "A function defined with `def` can compute a value and return it with `return`. The caller can then use that value like any other expression.",
+      "code": "def double(x):\n    return x * 2\n\nprint(double(5))  # 10"
+    },
+    "hints": [
+      "Define `def average(nums):` and `return sum(nums) / len(nums)`.",
+      "Use `list(map(float, input().split()))` to read the numbers.",
+      "Wrap the call with `round(..., 2)` before printing."
+    ],
+    "solution": "def average(nums):\n    return sum(nums) / len(nums)\n\nnums = list(map(float, input().split()))\nprint(round(average(nums), 2))",
+    "examples": [
+      {
+        "input": "10 20 30",
+        "output": "20.0"
+      },
+      {
+        "input": "1 2",
+        "output": "1.5"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "10 20 30",
+        "expectedOutput": "20.0"
+      },
+      {
+        "input": "1 2 3 4 5",
+        "expectedOutput": "3.0"
+      },
+      {
+        "input": "5",
+        "expectedOutput": "5.0"
+      },
+      {
+        "input": "1 2",
+        "expectedOutput": "1.5"
+      },
+      {
+        "input": "2.5 7.5",
+        "expectedOutput": "5.0"
+      }
+    ],
+    "starterCode": "def average(nums):\n    # return the mean of nums\n    pass\n\nnums = list(map(float, input().split()))\n# call average and print the rounded result\n"
   }
 ]

@@ -125,5 +125,60 @@
       }
     ],
     "starterCode": "# Write your code here\n# Read two numbers and print sum, difference, product\n"
+  },
+  {
+    "id": 18,
+    "module": "Basics",
+    "moduleOrder": 1,
+    "order": 4,
+    "difficulty": "medium",
+    "title": "Temperature Converter",
+    "description": "Read a temperature in **Fahrenheit** from input and print the equivalent **Celsius** value rounded to 2 decimal places.\n\nUse the formula: `C = (F - 32) * 5 / 9`.",
+    "concepts": [
+      "input",
+      "float",
+      "round",
+      "arithmetic"
+    ],
+    "conceptLesson": {
+      "title": "Working with Floats",
+      "content": "Use `float()` to convert input text into a decimal number, and `round(value, 2)` to keep two decimal places.",
+      "code": "x = float('3.14')\nprint(round(x * 2, 2))  # 6.28"
+    },
+    "hints": [
+      "Read the input with `float(input())` so it can handle decimals.",
+      "Apply the formula `(F - 32) * 5 / 9`.",
+      "Use `round(c, 2)` before printing to keep two decimal places."
+    ],
+    "solution": "f = float(input())\nc = (f - 32) * 5 / 9\nprint(round(c, 2))",
+    "examples": [
+      {
+        "input": "32",
+        "output": "0.0"
+      },
+      {
+        "input": "212",
+        "output": "100.0"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "32",
+        "expectedOutput": "0.0"
+      },
+      {
+        "input": "100",
+        "expectedOutput": "37.78"
+      },
+      {
+        "input": "212",
+        "expectedOutput": "100.0"
+      },
+      {
+        "input": "-40",
+        "expectedOutput": "-40.0"
+      }
+    ],
+    "starterCode": "# Read a Fahrenheit value and print the Celsius equivalent (2 decimals)\n"
   }
 ]
