@@ -8,7 +8,7 @@ DynoCode is a Python coding-practice site. Two services, one shared data file:
 
 - **`backend/main.py`** — FastAPI app. Four endpoints: `GET /health`, `GET /problems`, `GET /problems/{id}`, `POST /run`, `POST /submit`. User-submitted Python is executed via `subprocess.run([sys.executable, "-c", guard + code], ...)` in `execute_code()` with a 2-second timeout. The "guard" prepends a module blacklist + audit hook. **This sandbox is best-effort and bypassable** (e.g. `importlib.import_module('os')` defeats the blacklist; the audit hook's `args[0] in [0, 1, 2]` check only matches integer FDs, not file paths). Do not rely on it for untrusted execution — see `~/.claude/plans/create-a-plan-moonlit-fiddle.md` for the planned replacement.
 - **`frontend/app/page.js`** — Single ~1000-line client component containing both the dashboard and the problem editor (Monaco). View state is toggled via a `view` string, not Next.js routing. Talks to the backend via raw `fetch()` calls; `API_BASE` is resolved at module load from `NEXT_PUBLIC_API_URL` or `window.location.hostname:8000`. Progress (solved problems, attempts, streak, draft code) lives in `localStorage` under key `codepractice_progress`.
-- **`problems.json`** (repo root) — Single source of truth for problems, including hidden `testCases` used by `/submit`. The `/problems` endpoints strip `testCases` before returning. Schema is documented in `problems.md`. The backend re-reads this file on **every request** (no caching) — `load_problems()` tries `$PROBLEMS_PATH`, then `../problems.json`, then `/app/problems.json`.
+- **`problems/`** (repo root) — One JSON file per module (`basics.json`, `loops.json`, …). Each file is a top-level array of problem objects. The backend globs `*.json` in this directory at startup, validates each entry against the `Problem` Pydantic model, checks for duplicate ids, and caches results in `_problems_list` + `_problems_by_id`. Schema documented in `problems.md`. `load_problems()` resolution order: `$PROBLEMS_DIR` → `$PROBLEMS_PATH` (legacy single file) → `../problems` → `../problems.json` → `/app/problems` → `/app/problems.json`. Test cases (`testCases`) are stripped from the public `/problems` and `/problems/{id}` responses; only `/submit` consults them server-side.
 
 CORS allowlist is hardcoded in `backend/main.py:22-27` (localhost:3000, dynocode.in, www.dynocode.in, the DigitalOcean app URL). Adding a new deploy domain requires editing this list.
 
@@ -42,7 +42,7 @@ cd frontend && npm install && npm run dev
 
 ## Adding or editing problems
 
-Edit `problems.json` and follow the schema in `problems.md`. Because `load_problems()` reads from disk on every request, edits to the mounted file in Docker take effect immediately without a rebuild. Each problem needs both `examples` (visible to the user) and `testCases` (hidden, used by `/submit`).
+Edit the appropriate file in `problems/` (or create a new module file) and follow the schema in `problems.md`. Each problem needs both `examples` (visible to the user) and `testCases` (hidden, used by `/submit`). The `id` field must be unique across the entire `problems/` directory — startup will fail with a `duplicate problem id` error if not. After editing, restart the backend (or trigger uvicorn `--reload`) so the cache picks up changes; the directory is mounted as a Docker volume in `docker-compose.yml`, so production edits don't require an image rebuild.
 
 ## Deploy URLs
 

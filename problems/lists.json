@@ -1,0 +1,94 @@
+[
+  {
+    "id": 13,
+    "module": "Lists",
+    "moduleOrder": 5,
+    "order": 1,
+    "difficulty": "easy",
+    "title": "Find the Maximum",
+    "description": "Read **N**, then read **N** integers. Print the **largest number** among them.\n\nDo **not** use the built-in `max()` function.",
+    "concepts": [
+      "lists",
+      "comparison",
+      "loop"
+    ],
+    "conceptLesson": {
+      "title": "Lists & Finding Extremes",
+      "content": "A list stores multiple values. To find the maximum without `max()`, set the first element as your current max, then loop through the rest — update your max whenever you find something larger.",
+      "code": "nums = [3, 7, 2, 9, 1]\ncurrent_max = nums[0]\nfor num in nums[1:]:\n    if num > current_max:\n        current_max = num\nprint(current_max)  # 9"
+    },
+    "hints": [
+      "Read all numbers into a list",
+      "Set the first number as the current max",
+      "Loop through the rest, update max if you find a larger one"
+    ],
+    "solution": "n = int(input())\nnums = []\nfor _ in range(n):\n    nums.append(int(input()))\ncurrent_max = nums[0]\nfor num in nums[1:]:\n    if num > current_max:\n        current_max = num\nprint(current_max)",
+    "examples": [
+      {
+        "input": "5\n3\n7\n2\n9\n1",
+        "output": "9"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "5\n3\n7\n2\n9\n1",
+        "expectedOutput": "9"
+      },
+      {
+        "input": "3\n-1\n-5\n-2",
+        "expectedOutput": "-1"
+      },
+      {
+        "input": "1\n42",
+        "expectedOutput": "42"
+      }
+    ],
+    "starterCode": "# Write your code here\n# Read N numbers and find the largest (no max())\n"
+  },
+  {
+    "id": 14,
+    "module": "Lists",
+    "moduleOrder": 5,
+    "order": 2,
+    "difficulty": "medium",
+    "title": "Remove Duplicates",
+    "description": "Read **N**, then read **N** integers. Print the unique numbers in the **order they first appeared**, each on a new line.",
+    "concepts": [
+      "lists",
+      "set logic",
+      "order preservation"
+    ],
+    "conceptLesson": {
+      "title": "Preserving Order While Removing Duplicates",
+      "content": "A `set` removes duplicates but loses order. To keep the original order: use a list to track \"seen\" items, and only add new ones. This is a common interview pattern!",
+      "code": "nums = [3, 1, 3, 5, 1]\nseen = []\nfor num in nums:\n    if num not in seen:\n        seen.append(num)\nprint(seen)  # [3, 1, 5]"
+    },
+    "hints": [
+      "Use a list to track seen numbers",
+      "Only add a number if it's not already in the seen list",
+      "Print each unique number"
+    ],
+    "solution": "n = int(input())\nseen = []\nfor _ in range(n):\n    num = int(input())\n    if num not in seen:\n        seen.append(num)\nfor num in seen:\n    print(num)",
+    "examples": [
+      {
+        "input": "7\n3\n1\n3\n5\n1\n7\n3",
+        "output": "3\n1\n5\n7"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "7\n3\n1\n3\n5\n1\n7\n3",
+        "expectedOutput": "3\n1\n5\n7"
+      },
+      {
+        "input": "4\n1\n2\n3\n4",
+        "expectedOutput": "1\n2\n3\n4"
+      },
+      {
+        "input": "3\n5\n5\n5",
+        "expectedOutput": "5"
+      }
+    ],
+    "starterCode": "# Write your code here\n# Read N numbers and print unique ones in order\n"
+  }
+]

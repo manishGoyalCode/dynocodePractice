@@ -1,0 +1,156 @@
+[
+  {
+    "id": 15,
+    "module": "Functions",
+    "moduleOrder": 6,
+    "order": 1,
+    "difficulty": "medium",
+    "title": "Factorial",
+    "description": "Read a non-negative integer **N** and print its **factorial** (N!).\n\nRecall: 0! = 1, and N! = 1 × 2 × 3 × ... × N",
+    "concepts": [
+      "functions",
+      "loops",
+      "recursion"
+    ],
+    "conceptLesson": {
+      "title": "Defining Functions",
+      "content": "Functions let you organize reusable blocks of code. Use `def` to define a function. A function can take parameters and `return` a result.",
+      "code": "def greet(name):\n    return f\"Hello, {name}!\"\n\ndef add(a, b):\n    return a + b\n\nprint(greet(\"Alice\"))  # Hello, Alice!\nprint(add(3, 5))       # 8"
+    },
+    "hints": [
+      "Define a function factorial(n)",
+      "Use a loop or recursion",
+      "Don't forget: 0! = 1"
+    ],
+    "solution": "def factorial(n):\n    result = 1\n    for i in range(1, n + 1):\n        result *= i\n    return result\n\nn = int(input())\nprint(factorial(n))",
+    "examples": [
+      {
+        "input": "5",
+        "output": "120"
+      },
+      {
+        "input": "0",
+        "output": "1"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "5",
+        "expectedOutput": "120"
+      },
+      {
+        "input": "0",
+        "expectedOutput": "1"
+      },
+      {
+        "input": "1",
+        "expectedOutput": "1"
+      },
+      {
+        "input": "10",
+        "expectedOutput": "3628800"
+      }
+    ],
+    "starterCode": "# Write your code here\n# Define a factorial function and use it\n"
+  },
+  {
+    "id": 16,
+    "module": "Functions",
+    "moduleOrder": 6,
+    "order": 2,
+    "difficulty": "medium",
+    "title": "Is Prime?",
+    "description": "Read an integer **N** (N ≥ 2) and print **\"Yes\"** if it's a prime number, otherwise **\"No\"**.\n\nA prime number is only divisible by 1 and itself.",
+    "concepts": [
+      "functions",
+      "loops",
+      "optimization"
+    ],
+    "conceptLesson": {
+      "title": "Checking Primes Efficiently",
+      "content": "To check if N is prime, you only need to test divisors up to √N. If no number from 2 to √N divides N evenly, it's prime. This is much faster than checking all numbers up to N!",
+      "code": "import math\n\ndef is_prime(n):\n    if n < 2:\n        return False\n    for i in range(2, math.isqrt(n) + 1):\n        if n % i == 0:\n            return False\n    return True"
+    },
+    "hints": [
+      "Check divisibility from 2 to sqrt(N)",
+      "If any number divides N evenly, it's not prime",
+      "Import math and use math.isqrt(n) for the square root"
+    ],
+    "solution": "import math\n\ndef is_prime(n):\n    if n < 2:\n        return False\n    for i in range(2, math.isqrt(n) + 1):\n        if n % i == 0:\n            return False\n    return True\n\nn = int(input())\nprint(\"Yes\" if is_prime(n) else \"No\")",
+    "examples": [
+      {
+        "input": "7",
+        "output": "Yes"
+      },
+      {
+        "input": "12",
+        "output": "No"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "7",
+        "expectedOutput": "Yes"
+      },
+      {
+        "input": "12",
+        "expectedOutput": "No"
+      },
+      {
+        "input": "2",
+        "expectedOutput": "Yes"
+      },
+      {
+        "input": "1000000007",
+        "expectedOutput": "Yes"
+      }
+    ],
+    "starterCode": "# Write your code here\n# Check if N is a prime number\n"
+  },
+  {
+    "id": 17,
+    "module": "Functions",
+    "moduleOrder": 6,
+    "order": 3,
+    "difficulty": "hard",
+    "title": "Fibonacci Sequence",
+    "description": "Read an integer **N** and print the first **N** numbers of the Fibonacci sequence, each on a new line.\n\nThe Fibonacci sequence starts: 0, 1, 1, 2, 3, 5, 8, 13, ...",
+    "concepts": [
+      "functions",
+      "loops",
+      "sequences"
+    ],
+    "conceptLesson": {
+      "title": "The Fibonacci Pattern",
+      "content": "Fibonacci is a sequence where each number is the sum of the two before it. The trick: use two variables `a` and `b`, and in each step do `a, b = b, a + b`. This is Python's tuple swap!",
+      "code": "a, b = 0, 1\nfor _ in range(5):\n    print(a)\n    a, b = b, a + b\n# Output: 0, 1, 1, 2, 3"
+    },
+    "hints": [
+      "Start with a=0 and b=1",
+      "In each step: print a, then set a, b = b, a+b",
+      "Repeat N times"
+    ],
+    "solution": "n = int(input())\na, b = 0, 1\nfor _ in range(n):\n    print(a)\n    a, b = b, a + b",
+    "examples": [
+      {
+        "input": "7",
+        "output": "0\n1\n1\n2\n3\n5\n8"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "7",
+        "expectedOutput": "0\n1\n1\n2\n3\n5\n8"
+      },
+      {
+        "input": "1",
+        "expectedOutput": "0"
+      },
+      {
+        "input": "5",
+        "expectedOutput": "0\n1\n1\n2\n3"
+      }
+    ],
+    "starterCode": "# Write your code here\n# Print the first N Fibonacci numbers\n"
+  }
+]

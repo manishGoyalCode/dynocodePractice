@@ -56,35 +56,62 @@ class Problem(BaseModel):
 
 # ---------- Problem loading + caching ----------
 
-PROBLEMS_PATH = Path(os.getenv("PROBLEMS_PATH", "problems.json"))
+PROBLEMS_DIR_ENV = os.getenv("PROBLEMS_DIR")
+PROBLEMS_PATH_ENV = os.getenv("PROBLEMS_PATH")
 
 _problems_list: list[Problem] = []
 _problems_by_id: dict[int, Problem] = {}
 
 
-def _resolve_problems_path() -> Path:
-    if PROBLEMS_PATH.exists():
-        return PROBLEMS_PATH
-    parent_path = Path(__file__).parent.parent / "problems.json"
-    if parent_path.exists():
-        return parent_path
-    docker_path = Path("/app/problems.json")
-    if docker_path.exists():
-        return docker_path
+def _resolve_problems_source() -> Path:
+    """Locate problems data: a directory of per-module JSON files, or a legacy single problems.json."""
+    if PROBLEMS_DIR_ENV and Path(PROBLEMS_DIR_ENV).is_dir():
+        return Path(PROBLEMS_DIR_ENV)
+    if PROBLEMS_PATH_ENV and Path(PROBLEMS_PATH_ENV).exists():
+        return Path(PROBLEMS_PATH_ENV)
+
+    here = Path(__file__).parent
+    candidates = [
+        here.parent / "problems",
+        here.parent / "problems.json",
+        Path("/app/problems"),
+        Path("/app/problems.json"),
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
     raise FileNotFoundError(
-        f"Could not find problems.json. Tried: {PROBLEMS_PATH}, {parent_path}, {docker_path}"
+        "Could not locate problems data. Tried: "
+        + ", ".join(str(c) for c in candidates)
     )
 
 
+def _read_raw(source: Path) -> list[dict]:
+    """Load the raw problem array from either a directory or a single JSON file."""
+    if source.is_dir():
+        files = sorted(source.glob("*.json"))
+        if not files:
+            raise FileNotFoundError(f"{source} contains no .json files")
+        raw: list[dict] = []
+        for f in files:
+            with open(f, "r") as fh:
+                data = json.load(fh)
+            if not isinstance(data, list):
+                raise ValueError(f"{f} must be a top-level array, got {type(data).__name__}")
+            raw.extend(data)
+        return raw
+
+    with open(source, "r") as fh:
+        data = json.load(fh)
+    if not isinstance(data, list):
+        raise ValueError(f"{source} must be a top-level array, got {type(data).__name__}")
+    return data
+
+
 def load_problems() -> tuple[list[Problem], dict[int, Problem]]:
-    """Read, validate, and index problems.json. Raises on schema or file errors."""
-    path = _resolve_problems_path()
-    with open(path, "r") as f:
-        raw = json.load(f)
-    if not isinstance(raw, list):
-        raise ValueError(
-            f"problems.json must be a top-level array, got {type(raw).__name__}"
-        )
+    """Read, validate, and index problems data. Raises on schema or file errors."""
+    source = _resolve_problems_source()
+    raw = _read_raw(source)
 
     problems: list[Problem] = []
     seen_ids: set[int] = set()
@@ -92,14 +119,15 @@ def load_problems() -> tuple[list[Problem], dict[int, Problem]]:
         try:
             p = Problem.model_validate(item)
         except ValidationError as e:
-            raise ValueError(f"problems.json[{i}] failed validation: {e}") from e
+            raise ValueError(f"problem at index {i} failed validation: {e}") from e
         if p.id in seen_ids:
-            raise ValueError(f"problems.json: duplicate id {p.id}")
+            raise ValueError(f"duplicate problem id {p.id}")
         seen_ids.add(p.id)
         problems.append(p)
 
+    problems.sort(key=lambda p: (p.moduleOrder, p.order, p.id))
     by_id = {p.id: p for p in problems}
-    logger.info("Loaded %d problems from %s", len(problems), path)
+    logger.info("Loaded %d problems from %s", len(problems), source)
     return problems, by_id
 
 

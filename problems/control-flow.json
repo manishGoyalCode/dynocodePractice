@@ -1,0 +1,152 @@
+[
+  {
+    "id": 4,
+    "module": "Control Flow",
+    "moduleOrder": 2,
+    "order": 1,
+    "difficulty": "easy",
+    "title": "Even or Odd",
+    "description": "Read an integer from input and print **\"Even\"** if it's even, or **\"Odd\"** if it's odd.",
+    "concepts": [
+      "if/else",
+      "modulo"
+    ],
+    "conceptLesson": {
+      "title": "If/Else & The Modulo Operator",
+      "content": "The `if/else` statement lets your program make decisions. The **modulo operator** `%` gives the remainder of division — if `n % 2 == 0`, the number is even.",
+      "code": "n = int(input())\nif n % 2 == 0:\n    print(\"Even\")\nelse:\n    print(\"Odd\")"
+    },
+    "hints": [
+      "Use the modulo operator: number % 2",
+      "If the remainder is 0, the number is even"
+    ],
+    "solution": "n = int(input())\nif n % 2 == 0:\n    print(\"Even\")\nelse:\n    print(\"Odd\")",
+    "examples": [
+      {
+        "input": "4",
+        "output": "Even"
+      },
+      {
+        "input": "7",
+        "output": "Odd"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "4",
+        "expectedOutput": "Even"
+      },
+      {
+        "input": "7",
+        "expectedOutput": "Odd"
+      },
+      {
+        "input": "0",
+        "expectedOutput": "Even"
+      },
+      {
+        "input": "-3",
+        "expectedOutput": "Odd"
+      }
+    ],
+    "starterCode": "# Write your code here\n# Read a number and print Even or Odd\n"
+  },
+  {
+    "id": 5,
+    "module": "Control Flow",
+    "moduleOrder": 2,
+    "order": 2,
+    "difficulty": "easy",
+    "title": "Grade Calculator",
+    "description": "Read a score (0–100) from input and print the grade:\n- **90–100**: A\n- **80–89**: B\n- **70–79**: C\n- **60–69**: D\n- **Below 60**: F",
+    "concepts": [
+      "if/elif/else",
+      "comparison"
+    ],
+    "conceptLesson": {
+      "title": "If / Elif / Else Chains",
+      "content": "When you have multiple conditions, use `elif` (short for \"else if\"). Python checks conditions top-to-bottom and executes the **first** one that's true.",
+      "code": "score = int(input())\nif score >= 90:\n    print(\"A\")\nelif score >= 80:\n    print(\"B\")\nelse:\n    print(\"Other\")"
+    },
+    "hints": [
+      "Use if/elif/else chain",
+      "Check from highest to lowest: if score >= 90, elif score >= 80, etc."
+    ],
+    "solution": "score = int(input())\nif score >= 90:\n    print(\"A\")\nelif score >= 80:\n    print(\"B\")\nelif score >= 70:\n    print(\"C\")\nelif score >= 60:\n    print(\"D\")\nelse:\n    print(\"F\")",
+    "examples": [
+      {
+        "input": "85",
+        "output": "B"
+      },
+      {
+        "input": "42",
+        "output": "F"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "95",
+        "expectedOutput": "A"
+      },
+      {
+        "input": "85",
+        "expectedOutput": "B"
+      },
+      {
+        "input": "72",
+        "expectedOutput": "C"
+      },
+      {
+        "input": "65",
+        "expectedOutput": "D"
+      },
+      {
+        "input": "42",
+        "expectedOutput": "F"
+      }
+    ],
+    "starterCode": "# Write your code here\n# Read a score and print the letter grade\n"
+  },
+  {
+    "id": 6,
+    "module": "Control Flow",
+    "moduleOrder": 2,
+    "order": 3,
+    "difficulty": "medium",
+    "title": "FizzBuzz",
+    "description": "Read a number **N** and print the numbers from 1 to N, but:\n- For multiples of 3, print **\"Fizz\"**\n- For multiples of 5, print **\"Buzz\"**\n- For multiples of both 3 and 5, print **\"FizzBuzz\"**",
+    "concepts": [
+      "for loop",
+      "modulo",
+      "if/elif"
+    ],
+    "conceptLesson": {
+      "title": "Combining Loops & Conditions",
+      "content": "FizzBuzz is a classic programming challenge. The key insight: check divisibility by **15 first** (both 3 and 5), then by 3, then by 5, then print the number.",
+      "code": "for i in range(1, 6):\n    if i % 15 == 0:\n        print(\"FizzBuzz\")\n    elif i % 3 == 0:\n        print(\"Fizz\")\n    elif i % 5 == 0:\n        print(\"Buzz\")\n    else:\n        print(i)"
+    },
+    "hints": [
+      "Use a for loop with range(1, n+1)",
+      "Check divisibility by 15 first (both 3 and 5)",
+      "Then check 3, then 5, then just print the number"
+    ],
+    "solution": "n = int(input())\nfor i in range(1, n + 1):\n    if i % 15 == 0:\n        print(\"FizzBuzz\")\n    elif i % 3 == 0:\n        print(\"Fizz\")\n    elif i % 5 == 0:\n        print(\"Buzz\")\n    else:\n        print(i)",
+    "examples": [
+      {
+        "input": "15",
+        "output": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "5",
+        "expectedOutput": "1\n2\nFizz\n4\nBuzz"
+      },
+      {
+        "input": "15",
+        "expectedOutput": "1\n2\nFizz\n4\nBuzz\nFizz\n7\n8\nFizz\nBuzz\n11\nFizz\n13\n14\nFizzBuzz"
+      }
+    ],
+    "starterCode": "# Write your code here\n# Read N and print FizzBuzz from 1 to N\n"
+  }
+]

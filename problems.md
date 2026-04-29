@@ -1,6 +1,18 @@
 # 📝 Problem Data Structure
 
-This document defines the JSON schema for adding new problems to DynoCode. All problems are stored in `problems.json` in the root directory.
+This document defines the JSON schema for adding new problems to DynoCode. Problems live in `problems/` at the repo root, one JSON file per module:
+
+```
+problems/
+  basics.json
+  control-flow.json
+  functions.json
+  lists.json
+  loops.json
+  strings.json
+```
+
+Each file is a top-level array of problem objects. The backend reads every `*.json` in this directory at startup, validates them, and indexes by `id`. To add a new module, just create a new file (e.g. `problems/dictionaries.json`).
 
 ## 🏗 Schema Overview
 

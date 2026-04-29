@@ -5,9 +5,9 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./problems.json:/app/problems.json
+      - ./problems:/app/problems
     environment:
-      - PROBLEMS_PATH=/app/problems.json
+      - PROBLEMS_DIR=/app/problems
     restart: always
 
   frontend:

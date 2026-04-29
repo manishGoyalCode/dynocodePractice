@@ -1,0 +1,129 @@
+[
+  {
+    "id": 1,
+    "module": "Basics",
+    "moduleOrder": 1,
+    "order": 1,
+    "difficulty": "easy",
+    "title": "Hello World",
+    "description": "Write a program that prints **Hello, World!** to the screen.\n\nThis is the classic first program in any language!",
+    "concepts": [
+      "print"
+    ],
+    "conceptLesson": {
+      "title": "The print() Function",
+      "content": "The `print()` function displays text on the screen. Put your message inside quotes (single or double) and pass it to `print()`.",
+      "code": "print(\"Hello, World!\")\nprint('You can also use single quotes')"
+    },
+    "hints": [
+      "Use the print() function",
+      "Put your text inside quotes: print(\"Hello, World!\")"
+    ],
+    "solution": "print(\"Hello, World!\")",
+    "examples": [
+      {
+        "input": "",
+        "output": "Hello, World!"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "",
+        "expectedOutput": "Hello, World!"
+      }
+    ],
+    "starterCode": "# Write your code here\n# Print \"Hello, World!\" to the screen\n"
+  },
+  {
+    "id": 2,
+    "module": "Basics",
+    "moduleOrder": 1,
+    "order": 2,
+    "difficulty": "easy",
+    "title": "Greet the User",
+    "description": "Write a program that reads a **name** from input and prints a greeting in the format:\n**Hello, {name}!**",
+    "concepts": [
+      "input",
+      "print",
+      "f-string"
+    ],
+    "conceptLesson": {
+      "title": "Reading Input & F-Strings",
+      "content": "Use `input()` to read text from the user. F-strings let you embed variables directly inside a string using curly braces `{}`.",
+      "code": "name = input()          # reads a line of text\nprint(f\"Hello, {name}!\")  # f-string formatting"
+    },
+    "hints": [
+      "Use input() to read the name",
+      "Use an f-string: f\"Hello, {name}!\"",
+      "Or use concatenation: \"Hello, \" + name + \"!\""
+    ],
+    "solution": "name = input()\nprint(f\"Hello, {name}!\")",
+    "examples": [
+      {
+        "input": "Alice",
+        "output": "Hello, Alice!"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "Alice",
+        "expectedOutput": "Hello, Alice!"
+      },
+      {
+        "input": "World",
+        "expectedOutput": "Hello, World!"
+      },
+      {
+        "input": "Python",
+        "expectedOutput": "Hello, Python!"
+      }
+    ],
+    "starterCode": "# Write your code here\n# Read a name and print a greeting\n"
+  },
+  {
+    "id": 3,
+    "module": "Basics",
+    "moduleOrder": 1,
+    "order": 3,
+    "difficulty": "easy",
+    "title": "Simple Calculator",
+    "description": "Read two integers from input (one per line) and print their **sum**, **difference**, and **product**, each on a new line.",
+    "concepts": [
+      "input",
+      "int",
+      "arithmetic"
+    ],
+    "conceptLesson": {
+      "title": "Converting Types & Arithmetic",
+      "content": "`input()` always returns a string. Use `int()` to convert it to a number. Python supports standard math operators: `+`, `-`, `*`, `/`.",
+      "code": "a = int(input())  # read and convert to integer\nb = int(input())\nprint(a + b)      # addition\nprint(a * b)      # multiplication"
+    },
+    "hints": [
+      "Use int(input()) to read numbers",
+      "Store them in variables a and b",
+      "Print a+b, a-b, and a*b on separate lines"
+    ],
+    "solution": "a = int(input())\nb = int(input())\nprint(a + b)\nprint(a - b)\nprint(a * b)",
+    "examples": [
+      {
+        "input": "10\n3",
+        "output": "13\n7\n30"
+      }
+    ],
+    "testCases": [
+      {
+        "input": "10\n3",
+        "expectedOutput": "13\n7\n30"
+      },
+      {
+        "input": "5\n5",
+        "expectedOutput": "10\n0\n25"
+      },
+      {
+        "input": "0\n7",
+        "expectedOutput": "7\n-7\n0"
+      }
+    ],
+    "starterCode": "# Write your code here\n# Read two numbers and print sum, difference, product\n"
+  }
+]
