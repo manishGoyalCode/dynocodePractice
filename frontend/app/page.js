@@ -86,6 +86,12 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const handleOpenAuth = () => setShowLoginModal(true);
+    window.addEventListener('open-auth', handleOpenAuth);
+    return () => window.removeEventListener('open-auth', handleOpenAuth);
+  }, []);
+
   // --- Data Loading & Sync ---
   useEffect(() => {
     async function syncProgress() {
@@ -134,8 +140,9 @@ export default function Home() {
 
   // --- Actions ---
   const handleRun = async () => {
+    if (!ensureAuth()) return;
     setRunning(true);
-    setTestResults(null); // Clear test results so we can see the output
+    setTestResults(null); 
     try {
       const { data: { session: s } } = await supabase.auth.getSession();
       const res = await fetch(`${API_BASE}/run`, {
@@ -154,6 +161,7 @@ export default function Home() {
   };
 
   const handleSubmit = async () => {
+    if (!ensureAuth()) return;
     setSubmitting(true);
     try {
       const { data: { session: s } } = await supabase.auth.getSession();
@@ -201,22 +209,21 @@ export default function Home() {
     return acc;
   }, []);
 
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
   // --- Render Helpers ---
   if (loading) return <div className="loading-screen">Loading DynoCode...</div>;
 
-  if (!session) {
-    return (
-      <div className="auth-container">
-        <div className="auth-card">
-          <h1>⚡ DynoCode</h1>
-          <p>Master Python through practice.</p>
-          <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} providers={[]} />
-        </div>
-      </div>
-    );
-  }
-
   const activeProblem = problems.find(p => p.id === activeProblemId);
+
+  // Helper to check auth before sensitive actions
+  const ensureAuth = (action) => {
+    if (!session) {
+      setShowLoginModal(true);
+      return false;
+    }
+    return true;
+  };
 
   return (
     <div className="app-wrapper">
@@ -226,7 +233,7 @@ export default function Home() {
         totalProblems={problems.length} 
         streak={progress.streak} 
         isSaving={isSaving}
-        onLogout={() => supabase.auth.signOut()} 
+        onLogout={session ? () => supabase.auth.signOut() : null} 
       />
 
       <main className="app-body">
@@ -410,6 +417,24 @@ export default function Home() {
           )}
         </section>
       </main>
+      {/* Login Modal Overlay */}
+      {showLoginModal && (
+        <div className="auth-overlay">
+          <div className="auth-modal">
+            <button className="close-modal" onClick={() => setShowLoginModal(false)}>×</button>
+            <div className="auth-card">
+              <h1>⚡ Join DynoCode</h1>
+              <p>Log in to run code, save progress, and climb the leaderboard.</p>
+              <Auth 
+                supabaseClient={supabase} 
+                appearance={{ theme: ThemeSupa }} 
+                providers={[]} 
+                redirectTo={typeof window !== 'undefined' ? window.location.origin : ''}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

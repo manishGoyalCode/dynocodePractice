@@ -6,10 +6,10 @@ export default function Navbar({ solvedCount, totalProblems, streak, onLogout, i
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <a href="/" className="navbar-logo">
+        <div className="navbar-logo" onClick={() => window.location.href = '/'}>
           <div className="navbar-logo-icon">⚡</div>
-          <span>DynoCode</span>
-        </a>
+          <span className="logo-text">DynoCode</span>
+        </div>
       </div>
 
       <div className="navbar-center">
@@ -22,14 +22,20 @@ export default function Navbar({ solvedCount, totalProblems, streak, onLogout, i
       </div>
 
       <div className="navbar-right">
-        <div className={`autosave-indicator ${isSaving ? 'saving' : ''}`}>
-          <span className="autosave-dot"></span>
-          {isSaving ? "Saving..." : "Auto-saved"}
-        </div>
-        <div className="streak-badge" title="Daily Streak">
-          🔥 {streak}
-        </div>
-        <button className="signout-btn" onClick={onLogout}>Logout</button>
+        {onLogout ? (
+          <>
+            <div className={`autosave-indicator ${isSaving ? 'saving' : ''}`}>
+              <div className="autosave-dot"></div>
+              <span>{isSaving ? 'Saving...' : 'Synced'}</span>
+            </div>
+            <div className="streak-badge" title="Daily Streak">
+              🔥 {streak}
+            </div>
+            <button className="signout-btn" onClick={onLogout}>Logout</button>
+          </>
+        ) : (
+          <button className="signin-btn" onClick={() => window.dispatchEvent(new CustomEvent('open-auth'))}>Sign In</button>
+        )}
       </div>
     </nav>
   );
