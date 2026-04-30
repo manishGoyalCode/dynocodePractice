@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
+import { supabase } from "@/lib/supabase";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
 
 const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 
@@ -80,6 +83,8 @@ export default function Home() {
     streak: 0,
     lastDate: null,
   });
+  const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [leftTab, setLeftTab] = useState("description");
   const [revealedHints, setRevealedHints] = useState([]);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -88,11 +93,92 @@ export default function Home() {
   const mainRef = useRef(null);
   const autoSaveTimer = useRef(null);
 
+  // Auth listener
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   // Load progress
   useEffect(() => {
-    const p = loadProgress();
-    setProgress(p);
-  }, []);
+    async function syncProgress() {
+      if (!session?.user?.id) {
+        const p = loadProgress();
+        setProgress(p);
+        return;
+      }
+
+      // --- MIGRATION STEP ---
+      // Check if we have local progress that needs to be uploaded to the DB
+      const localProgress = loadProgress();
+      if (localProgress.solved.length > 0) {
+        console.log("🚛 Migrating local progress to database...");
+        
+        // Upload solved problems
+        for (const problemId of localProgress.solved) {
+          await supabase.from('user_progress').upsert({
+            user_id: session.user.id,
+            problem_id: problemId,
+            status: 'solved',
+            saved_code: localProgress.code[problemId] || ""
+          }, { onConflict: 'user_id,problem_id' });
+        }
+        
+        // Update profile
+        await supabase.from('profiles').upsert({
+          id: session.user.id,
+          streak: localProgress.streak,
+          last_active_date: localProgress.lastDate
+        });
+
+        // Clear local storage so we don't migrate again
+        localStorage.removeItem(STORAGE_KEY);
+      }
+
+      // Fetch fresh data from Supabase
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', session.user.id);
+
+      if (data && !error) {
+        const solved = data.filter(d => d.status === 'solved').map(d => d.problem_id);
+        const code = {};
+        const attempts = {};
+        data.forEach(d => {
+          if (d.saved_code) code[d.problem_id] = d.saved_code;
+          attempts[d.problem_id] = d.attempts_count;
+        });
+
+        // Get profile for streak
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('streak, last_active_date')
+          .eq('id', session.user.id)
+          .single();
+
+        setProgress({
+          solved,
+          code,
+          attempts,
+          streak: profile?.streak || 0,
+          lastDate: profile?.last_active_date || null
+        });
+      }
+    }
+
+    syncProgress();
+  }, [session]);
 
   // Fetch problems
   useEffect(() => {
@@ -156,7 +242,7 @@ export default function Home() {
   useEffect(() => {
     if (activeProblemId == null) return;
     clearTimeout(autoSaveTimer.current);
-    autoSaveTimer.current = setTimeout(() => {
+    autoSaveTimer.current = setTimeout(async () => {
       setProgress((prev) => {
         const updated = {
           ...prev,
@@ -165,9 +251,20 @@ export default function Home() {
         saveProgress(updated);
         return updated;
       });
+
+      // Save to Supabase
+      if (session?.user?.id) {
+        await supabase
+          .from('user_progress')
+          .upsert({
+            user_id: session.user.id,
+            problem_id: activeProblemId,
+            saved_code: code
+          }, { onConflict: 'user_id,problem_id' });
+      }
     }, 800);
     return () => clearTimeout(autoSaveTimer.current);
-  }, [code, activeProblemId]);
+  }, [code, activeProblemId, session]);
 
   // Switch to problem
   const openProblem = (id) => {
@@ -194,9 +291,15 @@ export default function Home() {
     setTestResults(null);
     setOutputError(false);
     try {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      const token = currentSession?.access_token;
+
       const res = await fetch(`${API_BASE}/run`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({ code, input: stdinInput }),
       });
       const data = await res.json();
@@ -216,9 +319,15 @@ export default function Home() {
     setTestResults(null);
     setOutputError(false);
     try {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      const token = currentSession?.access_token;
+
       const res = await fetch(`${API_BASE}/submit`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({ code, problemId: activeProblemId }),
       });
       const data = await res.json();
@@ -232,6 +341,26 @@ export default function Home() {
           let updated = { ...prev, solved };
           updated = updateStreak(updated);
           saveProgress(updated);
+
+          // Save solved status to Supabase
+          if (session?.user?.id) {
+            supabase
+              .from('user_progress')
+              .upsert({
+                user_id: session.user.id,
+                problem_id: activeProblemId,
+                status: 'solved',
+                saved_code: code
+              }, { onConflict: 'user_id,problem_id' }).then(() => {
+                // Update profile streak
+                supabase.from('profiles').upsert({
+                  id: session.user.id,
+                  streak: updated.streak,
+                  last_active_date: updated.lastDate
+                });
+              });
+          }
+
           return updated;
         });
         setShowConfetti(true);
@@ -239,12 +368,26 @@ export default function Home() {
       } else {
         // Track failed attempts
         setProgress((prev) => {
+          const newAttemptsCount = (prev.attempts?.[activeProblemId] || 0) + 1;
           const attempts = {
             ...prev.attempts,
-            [activeProblemId]: (prev.attempts?.[activeProblemId] || 0) + 1,
+            [activeProblemId]: newAttemptsCount,
           };
           const updated = { ...prev, attempts };
           saveProgress(updated);
+
+          // Save attempts to Supabase
+          if (session?.user?.id) {
+            supabase
+              .from('user_progress')
+              .upsert({
+                user_id: session.user.id,
+                problem_id: activeProblemId,
+                attempts_count: newAttemptsCount,
+                saved_code: code
+              }, { onConflict: 'user_id,problem_id' });
+          }
+
           return updated;
         });
       }
@@ -328,6 +471,24 @@ export default function Home() {
     totalProblems > 0 ? Math.round((solvedCount / totalProblems) * 100) : 0;
 
   // ─── Render ───
+  if (loading) return <div className="loading-screen">Loading...</div>;
+
+  if (!session) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <h1>⚡ DynoCode</h1>
+          <p>Login to track your progress and streaks!</p>
+          <Auth
+            supabaseClient={supabase}
+            appearance={{ theme: ThemeSupa }}
+            providers={[]}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-wrapper">
       {showConfetti && <Confetti />}
@@ -372,6 +533,13 @@ export default function Home() {
             <span className="autosave-dot" />
             Auto-saved
           </div>
+          <button 
+            className="signout-btn" 
+            onClick={() => supabase.auth.signOut()}
+            title="Sign Out"
+          >
+            Logout
+          </button>
         </div>
       </nav>
 

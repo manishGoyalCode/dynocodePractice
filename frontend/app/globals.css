@@ -1392,3 +1392,96 @@ body {
   .example-content { grid-template-columns: 1fr; }
   .test-case-body { grid-template-columns: 1fr; }
 }
+
+/* ===== Auth Screen ===== */
+.auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: radial-gradient(circle at center, var(--bg-card) 0%, var(--bg-primary) 100%);
+  padding: 20px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  animation: fadeIn 0.4s ease;
+}
+
+/* Supabase Auth UI Overrides */
+.supabase-auth-ui_ui-input {
+  color: white !important;
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+}
+
+.supabase-auth-ui_ui-button {
+  background-color: var(--accent-primary) !important;
+  color: white !important;
+}
+
+.supabase-auth-ui_ui-label {
+  color: var(--text-secondary) !important;
+  text-align: left;
+}
+
+.supabase-auth-ui_ui-message {
+  color: var(--accent-danger) !important;
+}
+
+.auth-card h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+}
+
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.signout-btn {
+  margin-left: 15px;
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.signout-btn:hover {
+  background: var(--accent-danger-glow);
+  color: var(--accent-danger);
+  border-color: var(--accent-danger);
+}

@@ -1,10 +1,27 @@
-import json
+import os
 import subprocess
 import sys
-from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from supabase import create_client, Client
+
+# Supabase Configuration for Backend
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+async def get_user(authorization: str = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid token")
+    
+    token = authorization.split(" ")[1]
+    try:
+        # Verify the token with Supabase
+        user = supabase.auth.get_user(token)
+        return user
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 app = FastAPI(title="DynoCode API")
 
@@ -30,29 +47,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-import os
-# Load problems from JSON
-PROBLEMS_PATH = Path(os.getenv("PROBLEMS_PATH", "problems.json"))
+# Data Loading Logic
 
 def load_problems():
-    # Priority 1: Environment Variable
-    if PROBLEMS_PATH.exists():
-        with open(PROBLEMS_PATH, "r") as f:
-            return json.load(f)
-            
-    # Priority 2: Parent directory (Local/Droplet mode)
-    parent_path = Path(__file__).parent.parent / "problems.json"
-    if parent_path.exists():
-        with open(parent_path, "r") as f:
-            return json.load(f)
-
-    # Priority 3: Docker absolute path
-    docker_path = Path("/app/problems.json")
-    if docker_path.exists():
-        with open(docker_path, "r") as f:
-            return json.load(f)
-            
-    raise FileNotFoundError(f"❌ Could not find problems.json. Tried: {PROBLEMS_PATH}, {parent_path}, {docker_path}")
+    """Fetch all problems from Supabase."""
+    try:
+        response = supabase.table("problems").select("*").order("id").execute()
+        probs = []
+        for p in response.data:
+            probs.append({
+                "id": p["id"],
+                "title": p["title"],
+                "description": p["description"],
+                "module": p["module"],
+                "moduleOrder": p.get("module_order", 0),
+                "order": p.get("problem_order", 0),
+                "difficulty": p["difficulty"],
+                "concepts": p.get("concepts", []),
+                "hints": p.get("hints", []),
+                "starterCode": p.get("initial_code", ""),
+                "solution": p.get("solution_code", ""),
+                "testCases": p.get("test_cases", []),
+                "examples": p.get("examples", []),
+                "conceptLesson": p.get("concept_lesson", "")
+            })
+        return probs
+    except Exception as e:
+        print(f"❌ Error loading problems from Supabase: {e}")
+        return []
 
 
 # ---------- Models ----------
@@ -136,61 +158,28 @@ sys.addaudithook(audit_hook)
 
 @app.get("/problems")
 def get_problems():
-    """Return all problems (without test cases for the list view)."""
-    problems = load_problems()
-    return [
-        {
-            "id": p["id"],
-            "title": p["title"],
-            "description": p["description"],
-            "examples": p["examples"],
-            "starterCode": p["starterCode"],
-            "module": p.get("module", "General"),
-            "moduleOrder": p.get("moduleOrder", 0),
-            "order": p.get("order", 0),
-            "difficulty": p.get("difficulty", "easy"),
-            "concepts": p.get("concepts", []),
-            "hints": p.get("hints", []),
-            "conceptLesson": p.get("conceptLesson"),
-            "solution": p.get("solution"),
-        }
-        for p in problems
-    ]
-
+    """Return all problems for the list view (public)."""
+    return load_problems()
 
 @app.get("/problems/{problem_id}")
 def get_problem(problem_id: int):
-    """Return a single problem by ID (without test cases)."""
+    """Return a single problem by ID."""
     problems = load_problems()
     for p in problems:
         if p["id"] == problem_id:
-            return {
-                "id": p["id"],
-                "title": p["title"],
-                "description": p["description"],
-                "examples": p["examples"],
-                "starterCode": p["starterCode"],
-                "module": p.get("module", "General"),
-                "moduleOrder": p.get("moduleOrder", 0),
-                "order": p.get("order", 0),
-                "difficulty": p.get("difficulty", "easy"),
-                "concepts": p.get("concepts", []),
-                "hints": p.get("hints", []),
-                "conceptLesson": p.get("conceptLesson"),
-                "solution": p.get("solution"),
-            }
+            return p
     return {"error": "Problem not found"}, 404
 
 
 @app.post("/run")
-def run_code(req: RunRequest):
+def run_code(req: RunRequest, user=Depends(get_user)):
     """Execute user code with optional stdin input and return output."""
     result = execute_code(req.code, req.input)
     return {"output": result["output"], "error": result["error"]}
 
 
 @app.post("/submit")
-def submit_code(req: SubmitRequest):
+def submit_code(req: SubmitRequest, user=Depends(get_user)):
     """Run code against all test cases for the given problem."""
     problems = load_problems()
     problem = None
