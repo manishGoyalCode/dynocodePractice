@@ -192,10 +192,14 @@ export default function Home() {
 
   // --- Grouping ---
   const modules = problems.reduce((acc, p) => {
-    if (!acc[p.module]) acc[p.module] = [];
-    acc[p.module].push(p);
+    let mod = acc.find(m => m.name === p.module);
+    if (!mod) {
+      mod = { name: p.module, problems: [] };
+      acc.push(mod);
+    }
+    mod.problems.push(p);
     return acc;
-  }, {});
+  }, []);
 
   // --- Render Helpers ---
   if (loading) return <div className="loading-screen">Loading DynoCode...</div>;

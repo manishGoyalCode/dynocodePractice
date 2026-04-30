@@ -1,6 +1,13 @@
 "use client";
 
 export default function Dashboard({ modules, progress, onProblemSelect }) {
+  const formatModuleName = (name) => {
+    if (!name) return "";
+    const dayMatch = name.match(/day\s*(\d+)/i);
+    if (dayMatch) return `Day ${dayMatch[1]}`;
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+
   return (
     <div className="dashboard-view">
       <header className="dashboard-header">
@@ -9,14 +16,16 @@ export default function Dashboard({ modules, progress, onProblemSelect }) {
       </header>
 
       <div className="dashboard-grid">
-        {Object.entries(modules).map(([moduleName, problems]) => {
+        {modules.map(module => {
+          const moduleName = module.name;
+          const problems = module.problems;
           const solvedInModule = problems.filter(p => progress.solved.includes(p.id)).length;
           const percent = Math.round((solvedInModule / problems.length) * 100);
 
           return (
             <div key={moduleName} className="module-card">
               <div className="module-card-header">
-                <h3>{moduleName}</h3>
+                <h3>{formatModuleName(moduleName)}</h3>
                 <span className="module-badge">{percent}%</span>
               </div>
               <div className="module-card-progress">

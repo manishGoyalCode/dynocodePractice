@@ -10,6 +10,13 @@ export default function Sidebar({
   expandedModules,
   toggleModule
 }) {
+  const formatModuleName = (name) => {
+    if (!name) return "";
+    const dayMatch = name.match(/day\s*(\d+)/i);
+    if (dayMatch) return `Day ${dayMatch[1]}`;
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -23,7 +30,9 @@ export default function Sidebar({
         />
       </div>
       <div className="sidebar-modules">
-        {Object.entries(modules).map(([moduleName, problems]) => {
+        {modules.map(module => {
+          const moduleName = module.name;
+          const problems = module.problems;
           const filtered = problems.filter(p => 
             p.title.toLowerCase().includes(searchQuery.toLowerCase())
           );
@@ -36,7 +45,7 @@ export default function Sidebar({
             <div key={moduleName} className="module-group">
               <div className="module-header" onClick={() => toggleModule(moduleName)}>
                 <span className={`module-chevron ${isExpanded ? 'open' : ''}`}>▶</span>
-                <span className="module-name">{moduleName}</span>
+                <span className="module-name">{formatModuleName(moduleName)}</span>
                 <span className="module-count">{solvedInModule}/{filtered.length}</span>
               </div>
               {isExpanded && (
