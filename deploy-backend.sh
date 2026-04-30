@@ -14,12 +14,11 @@ echo "🐍 Setting up Python Backend..."
 cd backend
 if [ ! -d "venv" ]; then
     python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-else
-    source venv/bin/activate
-    echo "⏩ Backend venv found, skipping pip install."
 fi
+
+source venv/bin/activate
+echo "📦 Installing/Updating dependencies..."
+pip install -r requirements.txt
 
 # --- 3. Start Backend ---
 # We use 0.0.0.0 so it is accessible from the outside (your frontend)
