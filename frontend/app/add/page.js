@@ -1,13 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
+import { useRouter } from "next/navigation";
 
 export default function AddProblem() {
   const [jsonInput, setJsonInput] = useState("");
   const [status, setStatus] = useState({ type: "", message: "" });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
+  const router = useRouter();
+
+  const ADMIN_EMAIL = "manishgoyaldata@gmail.com";
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.email === ADMIN_EMAIL) {
+        setAuthorized(true);
+      } else {
+        setAuthorized(false);
+      }
+      setLoading(false);
+    };
+    checkAuth();
+  }, []);
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -61,9 +79,28 @@ export default function AddProblem() {
     setLoading(false);
   };
 
+  if (loading) return <div className="app-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text-secondary)' }}>Verifying Access...</div>;
+
+  if (!authorized) {
+    return (
+      <div className="app-wrapper">
+        <Navbar streak={0} solvedCount={0} totalProblems={0} onLogout={() => {}} />
+        <main className="app-body">
+          <section className="main-content admin-page-content" style={{ textAlign: 'center', justifyContent: 'center' }}>
+            <div className="admin-card">
+              <h1 style={{ color: 'var(--accent-danger)', marginBottom: '16px' }}>🚫 Access Denied</h1>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>This page is restricted to administrators only.</p>
+              <button className="submit-problem-btn" onClick={() => router.push("/")}>Return to Dashboard</button>
+            </div>
+          </section>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="app-wrapper">
-      <Navbar streak={0} solvedCount={0} totalProblems={0} onLogout={() => {}} />
+      <Navbar streak={0} solvedCount={0} totalProblems={0} onLogout={() => {}} isSaving={false} />
       
       <main className="app-body">
         <section className="main-content admin-page-content">
