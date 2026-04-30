@@ -1,0 +1,64 @@
+"use client";
+
+export default function Sidebar({ 
+  modules, 
+  activeProblemId, 
+  onProblemSelect, 
+  progress, 
+  searchQuery, 
+  setSearchQuery,
+  expandedModules,
+  toggleModule
+}) {
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-header">
+        <h2>Modules</h2>
+        <input 
+          type="text" 
+          placeholder="Search problems..." 
+          className="sidebar-search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+      <div className="sidebar-modules">
+        {Object.entries(modules).map(([moduleName, problems]) => {
+          const filtered = problems.filter(p => 
+            p.title.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          if (filtered.length === 0 && searchQuery) return null;
+
+          const isExpanded = expandedModules[moduleName];
+          const solvedInModule = filtered.filter(p => progress.solved.includes(p.id)).length;
+
+          return (
+            <div key={moduleName} className="module-group">
+              <div className="module-header" onClick={() => toggleModule(moduleName)}>
+                <span className={`module-chevron ${isExpanded ? 'open' : ''}`}>▶</span>
+                <span className="module-name">{moduleName}</span>
+                <span className="module-count">{solvedInModule}/{filtered.length}</span>
+              </div>
+              {isExpanded && (
+                <div className="module-problems">
+                  {filtered.map(prob => (
+                    <div 
+                      key={prob.id} 
+                      className={`problem-item ${activeProblemId === prob.id ? 'active' : ''} ${progress.solved.includes(prob.id) ? 'solved' : ''}`}
+                      onClick={() => onProblemSelect(prob.id)}
+                    >
+                      <div className="problem-info">
+                        <div className="problem-item-title">{prob.title}</div>
+                      </div>
+                      <div className={`difficulty-dot ${prob.difficulty?.toLowerCase()}`}></div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </aside>
+  );
+}

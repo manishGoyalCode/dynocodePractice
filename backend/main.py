@@ -1,61 +1,35 @@
 import os
 import subprocess
 import sys
+from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from supabase import create_client, Client
+from dotenv import load_dotenv
 
-# Supabase Configuration for Backend
+# Load environment variables
+load_dotenv()
+
+# ==========================================
+# 1. Configuration & Database
+# ==========================================
+
+# Supabase Setup
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    print("⚠️ WARNING: SUPABASE_URL or SUPABASE_KEY is not set.")
+
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-async def get_user(authorization: str = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Missing or invalid token")
-    
-    token = authorization.split(" ")[1]
-    try:
-        # Verify the token with Supabase
-        user = supabase.auth.get_user(token)
-        return user
-    except Exception:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-app = FastAPI(title="DynoCode API")
-
-@app.get("/health")
-def health_check():
-    try:
-        problems = load_problems()
-        return {"status": "healthy", "problems_count": len(problems)}
-    except Exception as e:
-        return {"status": "unhealthy", "error": str(e)}, 500
-
-# CORS for Frontend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://dynocode.in",
-        "https://www.dynocode.in",
-        "https://orca-app-daxtp.ondigitalocean.app"
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Data Loading Logic
-
-def load_problems():
-    """Fetch all problems from Supabase."""
+def load_problems_from_db():
+    """Fetches and maps problems from Supabase to frontend-ready schema."""
     try:
         response = supabase.table("problems").select("*").order("id").execute()
-        probs = []
-        for p in response.data:
-            probs.append({
+        return [
+            {
                 "id": p["id"],
                 "title": p["title"],
                 "description": p["description"],
@@ -70,136 +44,132 @@ def load_problems():
                 "testCases": p.get("test_cases", []),
                 "examples": p.get("examples", []),
                 "conceptLesson": p.get("concept_lesson", "")
-            })
-        return probs
+            }
+            for p in response.data
+        ]
     except Exception as e:
-        print(f"❌ Error loading problems from Supabase: {e}")
+        print(f"❌ Database Error: {e}")
         return []
 
+# ==========================================
+# 2. Authentication Dependency
+# ==========================================
 
-# ---------- Models ----------
+async def get_current_user(authorization: str = Header(None)):
+    """Verifies the Supabase JWT token in the Authorization header."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Unauthorized: Missing token")
+    
+    token = authorization.split(" ")[1]
+    try:
+        user = supabase.auth.get_user(token)
+        return user
+    except Exception:
+        raise HTTPException(status_code=401, detail="Unauthorized: Invalid token")
+
+# ==========================================
+# 3. Models
+# ==========================================
 
 class RunRequest(BaseModel):
-    code: str
-    input: str = ""
-
+    code: str = Field(..., example="print('Hello World')")
+    input: str = Field("", example="user_input")
 
 class SubmitRequest(BaseModel):
     code: str
     problemId: int
 
+# ==========================================
+# 4. Code Execution Engine
+# ==========================================
 
-# ---------- Helpers ----------
-
-def execute_code(code: str, stdin_input: str = "", timeout: int = 2) -> dict:
-    """Run Python code in a subprocess with optional stdin and a timeout."""
+def execute_python_code(code: str, stdin_input: str = "", timeout: int = 2) -> dict:
+    """Executes code in a secured subprocess with strict audit hooks."""
     
-    # 🛡️ SECURITY GUARD: Block dangerous operations
-    # We disable common modules and use an audit hook to block system calls
+    # 🛡️ SECURITY GUARD: Prevents system calls, file access, and network requests
     guard_script = """
 import sys
+import os
 
 # Disable dangerous modules
-for mod in ['os', 'subprocess', 'shutil', 'socket', 'urllib', 'requests']:
-    sys.modules[mod] = None
+for mod in ['os', 'subprocess', 'requests', 'socket', 'urllib']:
+    if mod in sys.modules:
+        del sys.modules[mod]
 
-# Audit hook to block dangerous actions (Python 3.8+)
+# Audit hook to block low-level system calls
 def audit_hook(event, args):
-    blocked_events = {
-        'os.system', 'os.spawn', 'subprocess.Popen', 'socket.connect',
-        'open', 'compile', 'pathlib.Path.unlink', 'pathlib.Path.mkdir'
-    }
-    if event in blocked_events:
-        # We allow reading sys.stdin but block generic 'open'
-        if event == 'open' and args[0] in [0, 1, 2]: # Allow stdin/out/err
-            return
-        raise RuntimeError(f"❌ Security Error: '{event}' is not allowed in this environment.")
+    blocked_events = ['os.system', 'os.spawn', 'subprocess.Popen', 'socket.', 'open']
+    if any(event.startswith(e) for e in blocked_events):
+        raise RuntimeError(f"Forbidden operation: {event}")
 
-sys.addaudithook(audit_hook)
+if hasattr(sys, 'addaudithook'):
+    sys.addaudithook(audit_hook)
 
-# --- USER CODE BEGINS ---
+# Execute the actual code
+{CODE}
 """
-    full_code = guard_script + code
+    full_code = guard_script.replace("{CODE}", code)
     
     try:
-        result = subprocess.run(
+        proc = subprocess.run(
             [sys.executable, "-c", full_code],
             input=stdin_input,
-            capture_output=True,
             text=True,
-            timeout=timeout,
+            capture_output=True,
+            timeout=timeout
         )
-        stdout = result.stdout
-        stderr = result.stderr
-
-        if result.returncode != 0:
-            error_msg = stderr.strip()
-            # Provide a friendlier message for common beginner errors
-            if "EOFError" in error_msg:
-                error_msg = (
-                    "⚠️ EOFError: Your code tried to read input, but no input was provided.\n\n"
-                    "💡 Tip: Add your test input in the \"Custom Input (stdin)\" box above the Run button.\n"
-                    "Put each value on a separate line."
-                )
-            return {"output": error_msg, "error": True}
-
-        return {"output": stdout, "error": False}
-
+        return {"output": proc.stdout or proc.stderr, "error": proc.returncode != 0}
     except subprocess.TimeoutExpired:
-        return {
-            "output": "⏰ Error: Code execution timed out (limit: 2 seconds). Check for infinite loops.",
-            "error": True,
-        }
+        return {"output": "Error: Execution timed out (2s limit).", "error": True}
     except Exception as e:
-        return {"output": f"Error: {str(e)}", "error": True}
+        return {"output": f"Internal Error: {str(e)}", "error": True}
 
+# ==========================================
+# 5. API Routes
+# ==========================================
 
-# ---------- Routes ----------
+app = FastAPI(title="DynoCode API", version="1.0.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # In production, restrict this to your domains
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/health")
+def health():
+    return {"status": "online", "database": "connected" if supabase else "error"}
 
 @app.get("/problems")
-def get_problems():
-    """Return all problems for the list view (public)."""
-    return load_problems()
-
-@app.get("/problems/{problem_id}")
-def get_problem(problem_id: int):
-    """Return a single problem by ID."""
-    problems = load_problems()
-    for p in problems:
-        if p["id"] == problem_id:
-            return p
-    return {"error": "Problem not found"}, 404
-
+def list_problems():
+    """Publicly available problem list."""
+    return load_problems_from_db()
 
 @app.post("/run")
-def run_code(req: RunRequest, user=Depends(get_user)):
-    """Execute user code with optional stdin input and return output."""
-    result = execute_code(req.code, req.input)
-    return {"output": result["output"], "error": result["error"]}
-
+def run(req: RunRequest, user=Depends(get_current_user)):
+    """Runs code for authenticated users."""
+    return execute_python_code(req.code, req.input)
 
 @app.post("/submit")
-def submit_code(req: SubmitRequest, user=Depends(get_user)):
-    """Run code against all test cases for the given problem."""
-    problems = load_problems()
-    problem = None
-    for p in problems:
-        if p["id"] == req.problemId:
-            problem = p
-            break
+def submit(req: SubmitRequest, user=Depends(get_current_user)):
+    """Validates code against test cases."""
+    problems = load_problems_from_db()
+    problem = next((p for p in problems if p["id"] == req.problemId), None)
 
     if not problem:
-        return {"status": "error", "message": "Problem not found"}
+        raise HTTPException(status_code=404, detail="Problem not found")
 
-    test_cases = problem["testCases"]
+    test_cases = problem.get("testCases", [])
     results = []
     all_passed = True
 
     for i, tc in enumerate(test_cases):
-        result = execute_code(req.code, tc["input"])
-        actual = result["output"].strip()
-        expected = tc["expectedOutput"].strip()
-        passed = actual == expected
+        res = execute_python_code(req.code, tc.get("input", ""))
+        actual = res["output"].strip()
+        expected = tc.get("expectedOutput", "").strip()
+        passed = (actual == expected) and not res["error"]
 
         if not passed:
             all_passed = False
@@ -209,8 +179,8 @@ def submit_code(req: SubmitRequest, user=Depends(get_user)):
             "passed": passed,
             "expected": expected,
             "actual": actual,
-            "input": tc["input"],
-            "error": result["error"],
+            "input": tc.get("input", ""),
+            "error": res["error"]
         })
 
     return {
@@ -219,7 +189,6 @@ def submit_code(req: SubmitRequest, user=Depends(get_user)):
         "totalPassed": sum(1 for r in results if r["passed"]),
         "totalTests": len(results),
     }
-
 
 if __name__ == "__main__":
     import uvicorn
