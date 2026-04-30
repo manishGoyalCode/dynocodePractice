@@ -82,7 +82,10 @@ export default function Home() {
       setSession(session);
       setLoading(false);
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setSession(session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) setShowLoginModal(false);
+    });
     return () => subscription.unsubscribe();
   }, []);
 
