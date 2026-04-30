@@ -105,7 +105,7 @@ export default function Home() {
 
       // Fetch from Supabase
       const { data: progressData } = await supabase.from('user_progress').select('*').eq('user_id', session.user.id);
-      const { data: profileData } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+      const { data: profileData } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
 
       if (progressData) {
         setProgress({
