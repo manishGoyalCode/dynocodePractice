@@ -15,6 +15,11 @@ load_dotenv()
 # 1. Configuration & Database
 # ==========================================
 
+# Simple In-Memory Cache
+_problems_cache = None
+_last_fetch_time = 0
+CACHE_TTL = 300 # 5 minutes
+
 # Supabase Setup
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -25,10 +30,20 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def load_problems_from_db():
-    """Fetches and maps problems from Supabase to frontend-ready schema."""
+    """Fetches and maps problems from Supabase to frontend-ready schema with 5m caching."""
+    global _problems_cache, _last_fetch_time
+    import time
+    
+    current_time = time.time()
+    
+    # Return cached data if within TTL
+    if _problems_cache is not None and (current_time - _last_fetch_time) < CACHE_TTL:
+        return _problems_cache
+
     try:
+        print("🔄 Cache expired or empty. Fetching problems from Supabase...")
         response = supabase.table("problems").select("*").order("id").execute()
-        return [
+        mapped_problems = [
             {
                 "id": p["id"],
                 "title": p["title"],
@@ -47,9 +62,16 @@ def load_problems_from_db():
             }
             for p in response.data
         ]
+        
+        # Update Cache
+        _problems_cache = mapped_problems
+        _last_fetch_time = current_time
+        
+        return mapped_problems
     except Exception as e:
         print(f"❌ Database Error: {e}")
-        return []
+        # If DB fails, return stale cache if available, else empty list
+        return _problems_cache if _problems_cache else []
 
 # ==========================================
 # 2. Authentication Dependency
