@@ -190,6 +190,76 @@ def submit(req: SubmitRequest, user=Depends(get_current_user)):
         "totalTests": len(results),
     }
 
+@app.get("/metrics")
+def get_metrics():
+    """Provides system-wide metrics and historical activity."""
+    try:
+        from datetime import datetime, timedelta
+
+        # 1. Total Problems
+        problems_res = supabase.table("problems").select("*", count="exact").execute()
+        total_problems = problems_res.count if problems_res.count is not None else len(problems_res.data)
+
+        # 2. Total Registered Users
+        try:
+            # Try to get count from Auth Admin API (requires service role key)
+            auth_users = supabase.auth.admin.list_users()
+            total_users = len(auth_users)
+        except Exception:
+            # Fallback to profiles table if Admin API fails
+            profiles_res = supabase.table("profiles").select("*", count="exact").execute()
+            total_users = profiles_res.count if profiles_res.count is not None else 0
+
+        # 3. Total Solved (from user_progress)
+        progress_res = supabase.table("user_progress").select("user_id, status, updated_at").execute()
+        
+        total_solved = sum(1 for p in progress_res.data if p["status"] == "solved")
+
+        # 4. 7-Day History
+        history = {}
+        days_list = []
+        for i in range(6, -1, -1):
+            day_dt = (datetime.now() - timedelta(days=i)).date()
+            day_str = day_dt.strftime("%Y-%m-%d")
+            days_list.append(day_str)
+            history[day_str] = {"solved": 0, "active": set(), "registered": 0}
+
+        # Count daily registrations
+        if 'auth_users' in locals() and isinstance(auth_users, list):
+            for u in auth_users:
+                # Handle both object and dict types from Supabase SDK
+                created_at = getattr(u, 'created_at', u.get('created_at') if isinstance(u, dict) else None)
+                if created_at:
+                    reg_day = str(created_at)[:10]
+                    if reg_day in history:
+                        history[reg_day]["registered"] += 1
+
+        for p in progress_res.data:
+            updated_at_str = p["updated_at"][:10]
+            if updated_at_str in history:
+                if p["status"] == "solved":
+                    history[updated_at_str]["solved"] += 1
+                history[updated_at_str]["active"].add(p["user_id"])
+
+        graph_data = []
+        for day in days_list:
+            graph_data.append({
+                "date": day,
+                "solved": history[day]["solved"],
+                "active": len(history[day]["active"]),
+                "registered": history[day]["registered"]
+            })
+
+        return {
+            "total_users": total_users,
+            "total_solved": total_solved,
+            "total_problems": total_problems,
+            "history": graph_data
+        }
+    except Exception as e:
+        print(f"❌ Metrics Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
