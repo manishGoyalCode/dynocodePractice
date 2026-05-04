@@ -1,12 +1,19 @@
 import os
 import subprocess
 import sys
+import base64
 from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from supabase import create_client, Client
 from dotenv import load_dotenv
+
+# Try importing resource for Unix-based systems (Mac/Linux)
+try:
+    import resource
+except ImportError:
+    resource = None
 
 # Load environment variables
 load_dotenv()
@@ -102,49 +109,104 @@ class SubmitRequest(BaseModel):
     problemId: int
 
 # ==========================================
-# 4. Code Execution Engine
+# 4. Code Execution Engine (Pro Version)
 # ==========================================
 
 def execute_python_code(code: str, stdin_input: str = "", timeout: int = 2) -> dict:
-    """Executes code in a secured subprocess with strict audit hooks."""
+    """Executes code in a secured subprocess with resource limits and audit hooks."""
     
-    # 🛡️ SECURITY GUARD: Prevents system calls, file access, and network requests
-    guard_script = """
+    # 1. Base64 encode user code to prevent string injection attacks
+    encoded_code = base64.b64encode(code.encode()).decode()
+    
+    # 2. Build the guard script
+    guard_script = f"""
 import sys
-import os
+import base64
 
-# Disable dangerous modules
-for mod in ['os', 'subprocess', 'requests', 'socket', 'urllib']:
-    if mod in sys.modules:
-        del sys.modules[mod]
+# Attempt to set resource limits (Memory: 64MB)
+try:
+    import resource
+    # RLIMIT_AS: Address space (virtual memory)
+    # 64MB = 64 * 1024 * 1024
+    limit = 64 * 1024 * 1024
+    resource.setrlimit(resource.RLIMIT_AS, (limit, limit))
+except Exception:
+    pass
 
-# Audit hook to block low-level system calls
+# Security Guard: Block dangerous modules and low-level system calls
 def audit_hook(event, args):
     blocked_events = ['os.system', 'os.spawn', 'subprocess.Popen', 'socket.', 'open']
     if any(event.startswith(e) for e in blocked_events):
-        raise RuntimeError(f"Forbidden operation: {event}")
+        raise RuntimeError(f"Forbidden operation: {{event}}")
 
 if hasattr(sys, 'addaudithook'):
     sys.addaudithook(audit_hook)
 
-# Execute the actual code
-{CODE}
+# Disable dangerous modules already in sys.modules
+for mod in ['os', 'subprocess', 'requests', 'socket', 'urllib']:
+    if mod in sys.modules:
+        del sys.modules[mod]
+
+# Execute the actual user code
+try:
+    user_code = base64.b64decode("{encoded_code}").decode()
+    # Define a clean environment for execution
+    safe_globals = {{
+        '__name__': '__main__',
+        'print': print,
+        'input': input,
+        'range': range,
+        'len': len,
+        'int': int,
+        'float': float,
+        'str': str,
+        'list': list,
+        'dict': dict,
+        'set': set,
+        'tuple': tuple,
+        'sum': sum,
+        'min': min,
+        'max': max,
+        'abs': abs,
+        'enumerate': enumerate,
+        'zip': zip,
+        'sorted': sorted,
+        'reversed': reversed,
+        'bool': bool,
+        'Exception': Exception,
+        'RuntimeError': RuntimeError,
+        'ValueError': ValueError,
+        'TypeError': TypeError,
+        'IndexError': IndexError,
+        'KeyError': KeyError,
+        'StopIteration': StopIteration,
+    }}
+    exec(user_code, safe_globals)
+except Exception as e:
+    print(f"Runtime Error: {{e}}", file=sys.stderr)
+    sys.exit(1)
 """
-    full_code = guard_script.replace("{CODE}", code)
     
     try:
         proc = subprocess.run(
-            [sys.executable, "-c", full_code],
+            [sys.executable, "-c", guard_script],
             input=stdin_input,
             text=True,
             capture_output=True,
             timeout=timeout
         )
-        return {"output": proc.stdout or proc.stderr, "error": proc.returncode != 0}
+        
+        # Combine output and error, but truncate to 10,000 characters to prevent memory DOS
+        stdout_clean = proc.stdout[:10000]
+        stderr_clean = proc.stderr[:10000]
+        
+        output = stdout_clean if not stderr_clean else stderr_clean
+        return {"output": output or stdout_clean, "error": proc.returncode != 0}
+        
     except subprocess.TimeoutExpired:
-        return {"output": "Error: Execution timed out (2s limit).", "error": True}
+        return {"output": "Error: Time Limit Exceeded (2s).", "error": True}
     except Exception as e:
-        return {"output": f"Internal Error: {str(e)}", "error": True}
+        return {"output": f"Internal System Error: {str(e)}", "error": True}
 
 # ==========================================
 # 5. API Routes
