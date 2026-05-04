@@ -432,7 +432,7 @@ export default function Home() {
                 supabaseClient={supabase} 
                 appearance={{ theme: ThemeSupa }} 
                 providers={[]} 
-                redirectTo={typeof window !== 'undefined' ? window.location.origin : ''}
+                redirectTo={typeof window !== 'undefined' ? `${window.location.origin}/` : 'http://localhost:3000/'}
               />
             </div>
           </div>
