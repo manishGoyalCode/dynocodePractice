@@ -248,8 +248,8 @@ def run(req: RunRequest, user=Depends(get_current_user)):
                 "status": "error" if result.get("error") else "success",
                 "response_time_ms": elapsed_ms,
             }).execute()
-    except Exception:
-        pass
+    except Exception as log_err:
+        print(f"⚠️ Activity log (run) failed: {log_err}")
     return result
 
 @app.post("/submit")
@@ -293,8 +293,8 @@ def submit(req: SubmitRequest, user=Depends(get_current_user)):
                 "problem_id": req.problemId,
                 "status": submit_status,
             }).execute()
-    except Exception:
-        pass
+    except Exception as log_err:
+        print(f"⚠️ Activity log (submit) failed: {log_err}")
     return {
         "status": submit_status,
         "results": results,
