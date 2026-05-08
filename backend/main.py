@@ -2,6 +2,8 @@ import os
 import subprocess
 import sys
 import base64
+import time
+from datetime import datetime, timedelta
 from typing import List, Optional
 from fastapi import FastAPI, Depends, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
@@ -234,7 +236,21 @@ def list_problems():
 @app.post("/run")
 def run(req: RunRequest, user=Depends(get_current_user)):
     """Runs code for authenticated users."""
-    return execute_python_code(req.code, req.input)
+    start = time.time()
+    result = execute_python_code(req.code, req.input)
+    elapsed_ms = int((time.time() - start) * 1000)
+    try:
+        user_id = user.user.id if hasattr(user, 'user') else None
+        if user_id:
+            supabase.table("activity_log").insert({
+                "user_id": user_id,
+                "event_type": "run",
+                "status": "error" if result.get("error") else "success",
+                "response_time_ms": elapsed_ms,
+            }).execute()
+    except Exception:
+        pass
+    return result
 
 @app.post("/submit")
 def submit(req: SubmitRequest, user=Depends(get_current_user)):
@@ -267,8 +283,20 @@ def submit(req: SubmitRequest, user=Depends(get_current_user)):
             "error": res["error"]
         })
 
+    submit_status = "passed" if all_passed else "failed"
+    try:
+        user_id = user.user.id if hasattr(user, 'user') else None
+        if user_id:
+            supabase.table("activity_log").insert({
+                "user_id": user_id,
+                "event_type": "submit",
+                "problem_id": req.problemId,
+                "status": submit_status,
+            }).execute()
+    except Exception:
+        pass
     return {
-        "status": "passed" if all_passed else "failed",
+        "status": submit_status,
         "results": results,
         "totalPassed": sum(1 for r in results if r["passed"]),
         "totalTests": len(results),
@@ -276,69 +304,183 @@ def submit(req: SubmitRequest, user=Depends(get_current_user)):
 
 @app.get("/metrics")
 def get_metrics():
-    """Provides system-wide metrics and historical activity."""
+    """Provides comprehensive P0 platform metrics."""
     try:
-        from datetime import datetime, timedelta
+        now = datetime.now()
+        today = now.date()
 
-        # 1. Total Problems
+        # ── Aggregate Counts ──
         problems_res = supabase.table("problems").select("*", count="exact").execute()
         total_problems = problems_res.count if problems_res.count is not None else len(problems_res.data)
 
-        # 2. Total Registered Users
         try:
-            # Try to get count from Auth Admin API (requires service role key)
             auth_users = supabase.auth.admin.list_users()
             total_users = len(auth_users)
         except Exception:
-            # Fallback to profiles table if Admin API fails
             profiles_res = supabase.table("profiles").select("*", count="exact").execute()
             total_users = profiles_res.count if profiles_res.count is not None else 0
+            auth_users = None
 
-        # 3. Total Solved (from user_progress)
-        progress_res = supabase.table("user_progress").select("user_id, status, updated_at").execute()
-        
-        total_solved = sum(1 for p in progress_res.data if p["status"] == "solved")
+        progress_res = supabase.table("user_progress").select("user_id, problem_id, status, updated_at").execute()
+        progress_data = progress_res.data or []
+        total_solved = sum(1 for p in progress_data if p["status"] == "solved")
 
-        # 4. 7-Day History
+        # ── Submission counts from activity_log ──
+        total_runs = 0
+        total_submits = 0
+        timeout_count = 0
+        response_times = []
+        activity_data = []
+        try:
+            activity_res = supabase.table("activity_log").select("*").execute()
+            activity_data = activity_res.data or []
+            total_runs = sum(1 for a in activity_data if a["event_type"] == "run")
+            total_submits = sum(1 for a in activity_data if a["event_type"] == "submit")
+            timeout_count = sum(1 for a in activity_data if a.get("status") == "timeout")
+            response_times = [a["response_time_ms"] for a in activity_data if a.get("response_time_ms")]
+        except Exception:
+            pass
+
+        # ── DAU / WAU / Stickiness ──
+        today_str = today.strftime("%Y-%m-%d")
+        week_ago = (now - timedelta(days=7)).date()
+        dau_users = set()
+        wau_users = set()
+        for p in progress_data:
+            u_date = p["updated_at"][:10]
+            if u_date == today_str:
+                dau_users.add(p["user_id"])
+            if u_date >= week_ago.strftime("%Y-%m-%d"):
+                wau_users.add(p["user_id"])
+        for a in activity_data:
+            a_date = a["created_at"][:10]
+            if a_date == today_str:
+                dau_users.add(a["user_id"])
+            if a_date >= week_ago.strftime("%Y-%m-%d"):
+                wau_users.add(a["user_id"])
+
+        dau = len(dau_users)
+        wau = len(wau_users)
+        stickiness = round((dau / wau) * 100, 1) if wau > 0 else 0
+
+        # ── Avg problems solved per active user ──
+        users_with_solves = {}
+        for p in progress_data:
+            if p["status"] == "solved":
+                users_with_solves.setdefault(p["user_id"], 0)
+                users_with_solves[p["user_id"]] += 1
+        avg_solved_per_user = round(sum(users_with_solves.values()) / len(users_with_solves), 1) if users_with_solves else 0
+
+        # ── Signup → First Problem Rate ──
+        users_who_started = len(set(p["user_id"] for p in progress_data))
+        signup_to_problem_rate = round((users_who_started / total_users) * 100, 1) if total_users > 0 else 0
+
+        # ── Day-1 / Day-7 Retention (cohort from last 14 days) ──
+        day1_retained = 0
+        day7_retained = 0
+        cohort_size = 0
+        if auth_users and isinstance(auth_users, list):
+            user_activity_dates = {}
+            for p in progress_data:
+                user_activity_dates.setdefault(p["user_id"], set()).add(p["updated_at"][:10])
+            for a in activity_data:
+                if a.get("user_id"):
+                    user_activity_dates.setdefault(a["user_id"], set()).add(a["created_at"][:10])
+
+            for u in auth_users:
+                created_at = getattr(u, 'created_at', u.get('created_at') if isinstance(u, dict) else None)
+                uid = getattr(u, 'id', u.get('id') if isinstance(u, dict) else None)
+                if not created_at or not uid:
+                    continue
+                reg_date = str(created_at)[:10]
+                try:
+                    reg_dt = datetime.strptime(reg_date, "%Y-%m-%d").date()
+                except Exception:
+                    continue
+                if reg_dt < (today - timedelta(days=14)):
+                    continue
+                cohort_size += 1
+                dates = user_activity_dates.get(uid, set())
+                d1 = (reg_dt + timedelta(days=1)).strftime("%Y-%m-%d")
+                d7 = (reg_dt + timedelta(days=7)).strftime("%Y-%m-%d")
+                if d1 in dates:
+                    day1_retained += 1
+                if d7 in dates:
+                    day7_retained += 1
+
+        day1_retention = round((day1_retained / cohort_size) * 100, 1) if cohort_size > 0 else 0
+        day7_retention = round((day7_retained / cohort_size) * 100, 1) if cohort_size > 0 else 0
+
+        # ── API Performance (P50 / P95) ──
+        p50_ms = 0
+        p95_ms = 0
+        if response_times:
+            sorted_rt = sorted(response_times)
+            p50_ms = sorted_rt[len(sorted_rt) // 2]
+            p95_ms = sorted_rt[int(len(sorted_rt) * 0.95)]
+        timeout_rate = round((timeout_count / (total_runs + total_submits)) * 100, 1) if (total_runs + total_submits) > 0 else 0
+
+        # ── 7-Day History (unchanged logic) ──
         history = {}
         days_list = []
         for i in range(6, -1, -1):
-            day_dt = (datetime.now() - timedelta(days=i)).date()
+            day_dt = (now - timedelta(days=i)).date()
             day_str = day_dt.strftime("%Y-%m-%d")
             days_list.append(day_str)
-            history[day_str] = {"solved": 0, "active": set(), "registered": 0}
+            history[day_str] = {"solved": 0, "active": set(), "registered": 0, "submissions": 0}
 
-        # Count daily registrations
-        if 'auth_users' in locals() and isinstance(auth_users, list):
+        if auth_users and isinstance(auth_users, list):
             for u in auth_users:
-                # Handle both object and dict types from Supabase SDK
                 created_at = getattr(u, 'created_at', u.get('created_at') if isinstance(u, dict) else None)
                 if created_at:
                     reg_day = str(created_at)[:10]
                     if reg_day in history:
                         history[reg_day]["registered"] += 1
 
-        for p in progress_res.data:
-            updated_at_str = p["updated_at"][:10]
-            if updated_at_str in history:
+        for p in progress_data:
+            u_str = p["updated_at"][:10]
+            if u_str in history:
                 if p["status"] == "solved":
-                    history[updated_at_str]["solved"] += 1
-                history[updated_at_str]["active"].add(p["user_id"])
+                    history[u_str]["solved"] += 1
+                history[u_str]["active"].add(p["user_id"])
 
-        graph_data = []
-        for day in days_list:
-            graph_data.append({
-                "date": day,
-                "solved": history[day]["solved"],
-                "active": len(history[day]["active"]),
-                "registered": history[day]["registered"]
-            })
+        for a in activity_data:
+            a_str = a["created_at"][:10]
+            if a_str in history and a["event_type"] in ("run", "submit"):
+                history[a_str]["submissions"] += 1
+                history[a_str]["active"].add(a["user_id"])
+
+        graph_data = [{
+            "date": day,
+            "solved": history[day]["solved"],
+            "active": len(history[day]["active"]),
+            "registered": history[day]["registered"],
+            "submissions": history[day]["submissions"],
+        } for day in days_list]
 
         return {
+            # Aggregate
             "total_users": total_users,
             "total_solved": total_solved,
             "total_problems": total_problems,
-            "history": graph_data
+            "total_submissions": total_runs + total_submits,
+            # Engagement
+            "dau": dau,
+            "wau": wau,
+            "stickiness": stickiness,
+            # Learning
+            "avg_solved_per_user": avg_solved_per_user,
+            "signup_to_problem_rate": signup_to_problem_rate,
+            # Retention
+            "day1_retention": day1_retention,
+            "day7_retention": day7_retention,
+            "retention_cohort_size": cohort_size,
+            # Platform Health
+            "p50_response_ms": p50_ms,
+            "p95_response_ms": p95_ms,
+            "timeout_rate": timeout_rate,
+            # History
+            "history": graph_data,
         }
     except Exception as e:
         print(f"❌ Metrics Error: {e}")
